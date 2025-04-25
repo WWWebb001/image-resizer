@@ -1,35 +1,89 @@
 const upload = document.getElementById('upload');
+const dropArea = document.getElementById('drop-area');
+const processButton = document.getElementById('process');
+const downloadLink = document.getElementById('downloadLink');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const downloadButton = document.getElementById('download');
 
-upload.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-            drawImage(img);
-        };
-        img.src = event.target.result;
-    };
-    reader.readAsDataURL(file);
+let files = [];
+
+dropArea.addEventListener('click', () => upload.click());
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.style.background = '#f1f1f1';
+});
+dropArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropArea.style.background = 'white';
+});
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.style.background = 'white';
+    files = Array.from(e.dataTransfer.files);
 });
 
-function drawImage(img) {
+upload.addEventListener('change', (e) => {
+    files = Array.from(e.target.files);
+});
+
+processButton.addEventListener('click', async () => {
+    if (files.length === 0) {
+        alert("Please upload at least one image.");
+        return;
+    }
+
+    if (files.length === 1) {
+        const file = files[0];
+        const img = await loadImage(file);
+        const processedImage = processImage(img);
+
+        const link = document.createElement('a');
+        link.download = 'processed-image.jpg';
+        link.href = processedImage;
+        link.click();
+    } else {
+        const zip = new JSZip();
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const img = await loadImage(file);
+            const processedImage = processImage(img);
+
+            const data = processedImage.split(',')[1]; // Remove the data:image part
+            zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
+        }
+        const blob = await zip.generateAsync({ type: "blob" });
+        const zipLink = URL.createObjectURL(blob);
+
+        downloadLink.href = zipLink;
+        downloadLink.download = 'processed-images.zip';
+        downloadLink.style.display = 'inline-block';
+        downloadLink.innerText = 'Download Processed Images';
+    }
+});
+
+function loadImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.src = event.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+function processImage(img) {
     const canvasWidth = 350;
     const canvasHeight = 200;
     const padding = 15;
     const maxWidth = canvasWidth - 2 * padding;
     const maxHeight = canvasHeight - 2 * padding;
 
-    // Clear canvas
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    // Calculate new size
     let width = img.width;
     let height = img.height;
     const aspectRatio = width / height;
@@ -47,11 +101,6 @@ function drawImage(img) {
     const y = (canvasHeight - height) / 2;
 
     ctx.drawImage(img, x, y, width, height);
-}
 
-downloadButton.addEventListener('click', () => {
-    const link = document.createElement('a');
-    link.download = 'processed-image.jpg';
-    link.href = canvas.toDataURL('image/jpeg', 0.95);
-    link.click();
-});
+    return canvas.toDataURL('image/jpeg', 0.95);
+}
