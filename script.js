@@ -121,7 +121,7 @@ processButton.addEventListener('click', async () => {
             const processedImage = processImage(img);
 
             const link = document.createElement('a');
-            link.download = 'processed-image.jpg';
+            link.download = 'processed-image.png';
             link.href = processedImage;
             link.click();
         } else {
@@ -131,7 +131,7 @@ processButton.addEventListener('click', async () => {
                 const processedImage = processImage(img);
 
                 const data = processedImage.split(',')[1];
-                zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
+                zip.file(`processed-${i + 1}.png`, data, { base64: true });
             }
             const blob = await zip.generateAsync({ type: "blob" });
             const zipLink = URL.createObjectURL(blob);
