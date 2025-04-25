@@ -2,29 +2,153 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Super Simple Resizer:350x200px</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer Pro</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            margin: 30px auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            width: 90%;
+            text-align: center;
+        }
+
+        #drop-area {
+            border: 2px dashed #ccc;
+            border-radius: 6px;
+            padding: 40px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        #drop-area p {
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        #upload {
+            display: none;
+        }
+
+        #gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        #gallery img {
+            max-width: 150px;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .buttons button,
+        .buttons a {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .buttons button:hover,
+        .buttons a:hover {
+            background-color: #2980b9;
+        }
+
+        #downloadLink {
+            background-color: #2ecc71;
+        }
+
+        #downloadLink:hover {
+            background-color: #27ae60;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+            font-size: 0.9em;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1>Jan's Super Simple Resizer</h1>
+        <h1><i class="fas fa-image"></i> Image Resizer Pro</h1>
+        <p>Resize your images quickly and easily!</p>
     </header>
 
     <main class="container">
         <div id="drop-area">
-            <p><strong>Drag & Drop Images Here</strong></p>
-            <p>or click to browse</p>
+            <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
+            <p><strong>Drag and drop your images here</strong></p>
+            <p>or <label for="upload" class="browse-button">browse files</label></p>
             <input type="file" id="upload" accept="image/*" multiple>
         </div>
 
-        <div id="gallery"></div>
+        <div id="gallery">
+            </div>
 
         <div class="buttons">
-            <button id="process">Process Selected Images</button>
-            <button id="restart">Restart</button>
-            <a id="downloadLink" style="display:none;">Download</a>
+            <button id="process"><i class="fas fa-cog"></i> Process Images</button>
+            <button id="restart"><i class="fas fa-undo"></i> Restart</button>
+            <a id="downloadLink" style="display:none;"><i class="fas fa-download"></i> Download</a>
         </div>
     </main>
+
+    <footer>
+        <p>&copy; 2025 Image Resizer Pro. All rights reserved.</p>
+    </footer>
 
     <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
 
