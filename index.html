@@ -17,8 +17,13 @@
             <input type="file" id="upload" accept="image/*" multiple>
         </div>
 
-        <button id="process">Process Images</button>
-        <a id="downloadLink" style="display:none;">Download</a>
+        <div id="gallery"></div>
+
+        <div class="buttons">
+            <button id="process">Process Selected Images</button>
+            <button id="restart">Restart</button>
+            <a id="downloadLink" style="display:none;">Download</a>
+        </div>
     </main>
 
     <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
