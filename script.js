@@ -43,20 +43,55 @@ function handleFiles(files) {
 function displayThumbnail(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        const thumbDiv = document.createElement('div');
-        thumbDiv.className = 'thumb';
+        const img = new Image();
+        img.onload = () => {
+            const thumbCanvas = document.createElement('canvas');
+            const ctx = thumbCanvas.getContext('2d');
+            thumbCanvas.width = 350;
+            thumbCanvas.height = 200;
 
-        const img = document.createElement('img');
+            // Fill background white
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, thumbCanvas.width, thumbCanvas.height);
+
+            // Calculate aspect ratio scaling
+            const padding = 15;
+            const maxWidth = thumbCanvas.width - 2 * padding;
+            const maxHeight = thumbCanvas.height - 2 * padding;
+            let width = img.width;
+            let height = img.height;
+            const aspectRatio = width / height;
+
+            if (width > maxWidth) {
+                width = maxWidth;
+                height = width / aspectRatio;
+            }
+            if (height > maxHeight) {
+                height = maxHeight;
+                width = height * aspectRatio;
+            }
+
+            const x = (thumbCanvas.width - width) / 2;
+            const y = (thumbCanvas.height - height) / 2;
+
+            ctx.drawImage(img, x, y, width, height);
+
+            const thumbDiv = document.createElement('div');
+            thumbDiv.className = 'thumb';
+
+            const thumbImg = document.createElement('img');
+            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 0.8);
+            thumbImg.alt = 'Thumbnail';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = true;
+
+            thumbDiv.appendChild(thumbImg);
+            thumbDiv.appendChild(checkbox);
+            gallery.appendChild(thumbDiv);
+        };
         img.src = e.target.result;
-
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = true;
-
-        thumbDiv.appendChild(img);
-        thumbDiv.appendChild(checkbox);
-
-        gallery.appendChild(thumbDiv);
     };
     reader.readAsDataURL(file);
 }
