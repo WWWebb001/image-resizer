@@ -1,53 +1,74 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    text-align: center;
+/* Reset some defaults */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding: 20px;
+    padding: 0;
 }
 
+/* Header */
+header {
+    background-color: #333;
+    padding: 20px 0;
+    width: 100%;
+    text-align: center;
+}
+
+header h1 {
+    color: white;
+    font-size: 2em;
+}
+
+/* Main container */
 .container {
     max-width: 600px;
-    margin: 60px auto;
+    margin: 40px auto;
     padding: 20px;
+    text-align: center;
 }
 
-h1 {
-    font-size: 2em;
-    margin-bottom: 40px;
-}
-
+/* Drop Area */
 #drop-area {
-    border: 3px dashed #bbb;
+    border: 3px dashed #aaa;
     border-radius: 10px;
-    padding: 30px;
-    background: white;
+    padding: 40px 20px;
+    background: #fff;
     cursor: pointer;
-    transition: background 0.3s;
+    transition: background 0.3s, border-color 0.3s;
 }
 
 #drop-area:hover {
     background: #f1f1f1;
+    border-color: #333;
+}
+
+#drop-area p {
+    margin: 10px 0;
+    font-size: 1.1em;
+    color: #555;
 }
 
 #upload {
     display: none;
 }
 
-#process {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 16px;
+/* Buttons */
+#process, #downloadLink {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 12px 25px;
+    font-size: 1em;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
     cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s;
 }
 
-#downloadLink {
-    display: inline-block;
-    margin-top: 20px;
-    font-size: 16px;
-    text-decoration: none;
-    background: #007bff;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
+#process:hover, #downloadLink:hover {
+    background-color: #555;
 }
+
+/* Responsive Tweaks */
+@media (
