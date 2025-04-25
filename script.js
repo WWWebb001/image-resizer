@@ -83,7 +83,7 @@ function displayThumbnail(file) {
             thumbDiv.className = 'thumb';
 
             const thumbImg = document.createElement('img');
-            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 0.8);
+            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 1.0);
             thumbImg.alt = 'Thumbnail';
 
             const checkbox = document.createElement('input');
