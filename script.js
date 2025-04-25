@@ -6,6 +6,8 @@ const restartButton = document.getElementById('restart');
 const downloadLink = document.getElementById('downloadLink');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
+const spinner = document.getElementById('spinner');
+const toast = document.getElementById('toast');
 
 let allFiles = [];
 
@@ -53,7 +55,6 @@ function displayThumbnail(file) {
             thumbCanvas.width = 350;
             thumbCanvas.height = 200;
 
-            // Fill background white
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, thumbCanvas.width, thumbCanvas.height);
 
@@ -112,7 +113,7 @@ processButton.addEventListener('click', async () => {
     // Disable buttons and show spinner
     processButton.disabled = true;
     restartButton.disabled = true;
-    document.getElementById('spinner').classList.remove('hidden');
+    spinner.classList.remove('hidden');
 
     try {
         if (selectedFiles.length === 1) {
@@ -143,8 +144,7 @@ processButton.addEventListener('click', async () => {
     } catch (error) {
         alert("Something went wrong while processing the images.");
     } finally {
-        // Always hide spinner and re-enable buttons
-        document.getElementById('spinner').classList.add('hidden');
+        spinner.classList.add('hidden');
         processButton.disabled = false;
         restartButton.disabled = false;
         showToast();
@@ -204,7 +204,6 @@ function processImage(img) {
 }
 
 function showToast() {
-    const toast = document.getElementById('toast');
     toast.classList.remove('hidden');
     setTimeout(() => {
         toast.classList.add('hidden');
@@ -212,11 +211,7 @@ function showToast() {
 }
 
 function resetUI() {
-    // Hide spinner
-    document.getElementById('spinner').classList.add('hidden');
-    // Hide download link
-    downloadLink.style.display = 'none';
-    // Hide toast
-    const toast = document.getElementById('toast');
+    spinner.classList.add('hidden');
     toast.classList.add('hidden');
+    downloadLink.style.display = 'none';
 }
