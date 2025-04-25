@@ -83,7 +83,7 @@ function displayThumbnail(file) {
             thumbDiv.className = 'thumb';
 
             const thumbImg = document.createElement('img');
-            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 1.0);
+            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 0.8);
             thumbImg.alt = 'Thumbnail';
 
             const checkbox = document.createElement('input');
@@ -200,7 +200,7 @@ function processImage(img) {
 
     ctx.drawImage(img, x, y, width, height);
 
-    return canvas.toDataURL('image/jpeg', 0.95);
+    return ccanvas.toDataURL('image/png');
 }
 
 function showToast() {
