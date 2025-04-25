@@ -1,3 +1,8 @@
+/* Hide elements with 'hidden' class */
+.hidden {
+    display: none !important;
+}
+
 /* Reset defaults */
 * {
     box-sizing: border-box;
