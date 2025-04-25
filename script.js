@@ -1,185 +1,46 @@
-const upload = document.getElementById('upload');
-const dropArea = document.getElementById('drop-area');
-const gallery = document.getElementById('gallery');
-const processButton = document.getElementById('process');
-const restartButton = document.getElementById('restart');
-const downloadLink = document.getElementById('downloadLink');
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resizer Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <h1><i class="fas fa-image"></i> Image Resizer Pro</h1>
+        <p>Resize your images quickly and easily!</p>
+    </header>
 
-let allFiles = [];
+    <main class="container">
+        <div id="drop-area">
+            <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
+            <p><strong>Drag and drop your images here</strong></p>
+            <p>or <label for="upload" class="browse-button">browse files</label></p>
+            <input type="file" id="upload" accept="image/*" multiple>
+        </div>
 
-dropArea.addEventListener('click', () => upload.click());
+        <div id="gallery">
+        </div>
 
-dropArea.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropArea.classList.add('highlight');
-});
+        <div class="buttons">
+            <button id="process"><i class="fas fa-cog"></i> Process Images</button>
+            <button id="restart"><i class="fas fa-undo"></i> Restart</button>
+            <a id="downloadLink" style="display:none;"><i class="fas fa-download"></i> Download</a>
+        </div>
+    </main>
 
-dropArea.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    dropArea.classList.remove('highlight');
-});
+    <footer>
+        <p>&copy; 2025 Image Resizer Pro. All rights reserved.</p>
+    </footer>
 
-dropArea.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropArea.classList.remove('highlight');
-    handleFiles(e.dataTransfer.files);
-});
+    <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
 
-upload.addEventListener('change', (e) => {
-    handleFiles(e.target.files);
-});
-
-function handleFiles(files) {
-    for (let file of files) {
-        if (file.type.startsWith('image/')) {
-            allFiles.push(file);
-            displayThumbnail(file);
-        }
-    }
-}
-
-function displayThumbnail(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-            const thumbCanvas = document.createElement('canvas');
-            const ctx = thumbCanvas.getContext('2d');
-            thumbCanvas.width = 350;
-            thumbCanvas.height = 200;
-
-            // Fill background white
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, thumbCanvas.width, thumbCanvas.height);
-
-            // Calculate aspect ratio scaling
-            const padding = 15;
-            const maxWidth = thumbCanvas.width - 2 * padding;
-            const maxHeight = thumbCanvas.height - 2 * padding;
-            let width = img.width;
-            let height = img.height;
-            const aspectRatio = width / height;
-
-            if (width > maxWidth) {
-                width = maxWidth;
-                height = width / aspectRatio;
-            }
-            if (height > maxHeight) {
-                height = maxHeight;
-                width = height * aspectRatio;
-            }
-
-            const x = (thumbCanvas.width - width) / 2;
-            const y = (thumbCanvas.height - height) / 2;
-
-            ctx.drawImage(img, x, y, width, height);
-
-            const thumbDiv = document.createElement('div');
-            thumbDiv.className = 'thumb';
-
-            const thumbImg = document.createElement('img');
-            thumbImg.src = thumbCanvas.toDataURL('image/jpeg', 0.8);
-            thumbImg.alt = 'Thumbnail';
-
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.checked = true;
-
-            thumbDiv.appendChild(thumbImg);
-            thumbDiv.appendChild(checkbox);
-            gallery.appendChild(thumbDiv);
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-processButton.addEventListener('click', async () => {
-    const thumbs = Array.from(document.querySelectorAll('.thumb'));
-    const selectedFiles = thumbs
-        .map((thumb, index) => thumb.querySelector('input').checked ? allFiles[index] : null)
-        .filter(f => f);
-
-    if (selectedFiles.length === 0) {
-        alert("Please select at least one image to process.");
-        return;
-    }
-
-    if (selectedFiles.length === 1) {
-        const img = await loadImage(selectedFiles[0]);
-        const processedImage = processImage(img);
-
-        const link = document.createElement('a');
-        link.download = 'processed-image.jpg';
-        link.href = processedImage;
-        link.click();
-    } else {
-        const zip = new JSZip();
-        for (let i = 0; i < selectedFiles.length; i++) {
-            const img = await loadImage(selectedFiles[i]);
-            const processedImage = processImage(img);
-
-            const data = processedImage.split(',')[1];
-            zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
-        }
-        const blob = await zip.generateAsync({ type: "blob" });
-        const zipLink = URL.createObjectURL(blob);
-
-        downloadLink.href = zipLink;
-        downloadLink.download = 'processed-images.zip';
-        downloadLink.style.display = 'inline-block';
-        downloadLink.innerText = 'Download Processed Images';
-    }
-});
-
-restartButton.addEventListener('click', () => {
-    allFiles = [];
-    gallery.innerHTML = '';
-    downloadLink.style.display = 'none';
-});
-
-function loadImage(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = new Image();
-            img.onload = () => resolve(img);
-            img.src = event.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-    });
-}
-
-function processImage(img) {
-    const canvasWidth = 350;
-    const canvasHeight = 200;
-    const padding = 15;
-    const maxWidth = canvasWidth - 2 * padding;
-    const maxHeight = canvasHeight - 2 * padding;
-
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-    let width = img.width;
-    let height = img.height;
-    const aspectRatio = width / height;
-
-    if (width > maxWidth) {
-        width = maxWidth;
-        height = width / aspectRatio;
-    }
-    if (height > maxHeight) {
-        height = maxHeight;
-        width = height * aspectRatio;
-    }
-
-    const x = (canvasWidth - width) / 2;
-    const y = (canvasHeight - height) / 2;
-
-    ctx.drawImage(img, x, y, width, height);
-
-    return canvas.toDataURL('image/jpeg', 0.95);
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
