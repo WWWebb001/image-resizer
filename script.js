@@ -43,13 +43,20 @@ function handleFiles(files) {
 function displayThumbnail(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
-        const div = document.createElement('div');
-        div.className = 'thumb';
-        div.innerHTML = `
-            <img src="${e.target.result}">
-            <input type="checkbox" checked>
-        `;
-        gallery.appendChild(div);
+        const thumbDiv = document.createElement('div');
+        thumbDiv.className = 'thumb';
+
+        const img = document.createElement('img');
+        img.src = e.target.result;
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = true;
+
+        thumbDiv.appendChild(img);
+        thumbDiv.appendChild(checkbox);
+
+        gallery.appendChild(thumbDiv);
     };
     reader.readAsDataURL(file);
 }
