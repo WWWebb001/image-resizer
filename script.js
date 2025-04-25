@@ -1,11 +1,13 @@
 const upload = document.getElementById('upload');
 const dropArea = document.getElementById('drop-area');
+const gallery = document.getElementById('gallery');
 const processButton = document.getElementById('process');
+const restartButton = document.getElementById('restart');
 const downloadLink = document.getElementById('downloadLink');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-let files = [];
+let allFiles = [];
 
 dropArea.addEventListener('click', () => upload.click());
 
@@ -22,26 +24,49 @@ dropArea.addEventListener('dragleave', (e) => {
 dropArea.addEventListener('drop', (e) => {
     e.preventDefault();
     dropArea.classList.remove('highlight');
-    files = Array.from(e.dataTransfer.files);
+    handleFiles(e.dataTransfer.files);
 });
 
 upload.addEventListener('change', (e) => {
-    files = Array.from(e.target.files);
+    handleFiles(e.target.files);
 });
 
-upload.addEventListener('change', (e) => {
-    files = Array.from(e.target.files);
-});
+function handleFiles(files) {
+    for (let file of files) {
+        if (file.type.startsWith('image/')) {
+            allFiles.push(file);
+            displayThumbnail(file);
+        }
+    }
+}
+
+function displayThumbnail(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const div = document.createElement('div');
+        div.className = 'thumb';
+        div.innerHTML = `
+            <img src="${e.target.result}">
+            <input type="checkbox" checked>
+        `;
+        gallery.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+}
 
 processButton.addEventListener('click', async () => {
-    if (files.length === 0) {
-        alert("Please upload at least one image.");
+    const thumbs = Array.from(document.querySelectorAll('.thumb'));
+    const selectedFiles = thumbs
+        .map((thumb, index) => thumb.querySelector('input').checked ? allFiles[index] : null)
+        .filter(f => f);
+
+    if (selectedFiles.length === 0) {
+        alert("Please select at least one image to process.");
         return;
     }
 
-    if (files.length === 1) {
-        const file = files[0];
-        const img = await loadImage(file);
+    if (selectedFiles.length === 1) {
+        const img = await loadImage(selectedFiles[0]);
         const processedImage = processImage(img);
 
         const link = document.createElement('a');
@@ -50,12 +75,11 @@ processButton.addEventListener('click', async () => {
         link.click();
     } else {
         const zip = new JSZip();
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const img = await loadImage(file);
+        for (let i = 0; i < selectedFiles.length; i++) {
+            const img = await loadImage(selectedFiles[i]);
             const processedImage = processImage(img);
 
-            const data = processedImage.split(',')[1]; // Remove the data:image part
+            const data = processedImage.split(',')[1];
             zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
         }
         const blob = await zip.generateAsync({ type: "blob" });
@@ -66,6 +90,12 @@ processButton.addEventListener('click', async () => {
         downloadLink.style.display = 'inline-block';
         downloadLink.innerText = 'Download Processed Images';
     }
+});
+
+restartButton.addEventListener('click', () => {
+    allFiles = [];
+    gallery.innerHTML = '';
+    downloadLink.style.display = 'none';
 });
 
 function loadImage(file) {
