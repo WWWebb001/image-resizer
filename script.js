@@ -207,3 +207,13 @@ function showToast() {
         toast.classList.add('hidden');
     }, 4000);
 }
+
+function resetUI() {
+    // Hide spinner
+    document.getElementById('spinner').classList.add('hidden');
+    // Hide download link
+    downloadLink.style.display = 'none';
+    // Hide toast
+    const toast = document.getElementById('toast');
+    toast.classList.add('hidden');
+}
