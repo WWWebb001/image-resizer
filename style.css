@@ -1,0 +1,53 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 2em;
+    margin-bottom: 40px;
+}
+
+#drop-area {
+    border: 3px dashed #bbb;
+    border-radius: 10px;
+    padding: 30px;
+    background: white;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#drop-area:hover {
+    background: #f1f1f1;
+}
+
+#upload {
+    display: none;
+}
+
+#process {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#downloadLink {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 16px;
+    text-decoration: none;
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
