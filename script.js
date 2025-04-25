@@ -200,7 +200,7 @@ function processImage(img) {
 
     ctx.drawImage(img, x, y, width, height);
 
-    return ccanvas.toDataURL('image/png');
+    return canvas.toDataURL('image/png');
 }
 
 function showToast() {
