@@ -6,17 +6,20 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
+    <header>
         <h1>Jan's Super Simple Resizer</h1>
+    </header>
+
+    <main class="container">
         <div id="drop-area">
-            <p>Drag & Drop Images Here</p>
-            <p>or click to upload</p>
+            <p><strong>Drag & Drop Images Here</strong></p>
+            <p>or click to browse</p>
             <input type="file" id="upload" accept="image/*" multiple>
         </div>
-        <br>
+
         <button id="process">Process Images</button>
         <a id="downloadLink" style="display:none;">Download</a>
-    </div>
+    </main>
 
     <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
 
