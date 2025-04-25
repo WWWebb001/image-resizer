@@ -8,18 +8,25 @@ const ctx = canvas.getContext('2d');
 let files = [];
 
 dropArea.addEventListener('click', () => upload.click());
+
 dropArea.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropArea.style.background = '#f1f1f1';
+    dropArea.classList.add('highlight');
 });
+
 dropArea.addEventListener('dragleave', (e) => {
     e.preventDefault();
-    dropArea.style.background = 'white';
+    dropArea.classList.remove('highlight');
 });
+
 dropArea.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropArea.style.background = 'white';
+    dropArea.classList.remove('highlight');
     files = Array.from(e.dataTransfer.files);
+});
+
+upload.addEventListener('change', (e) => {
+    files = Array.from(e.target.files);
 });
 
 upload.addEventListener('change', (e) => {
