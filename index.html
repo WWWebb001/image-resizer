@@ -2,16 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Image Resizer Tool</title>
+    <title>Jan's Super Simple Resizer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Upload an Image</h1>
-    <input type="file" id="upload" accept="image/*">
-    <br><br>
-    <canvas id="canvas" width="350" height="200" style="border:1px solid #ccc;"></canvas>
-    <br><br>
-    <button id="download">Download Processed Image</button>
+    <div class="container">
+        <h1>Jan's Super Simple Resizer</h1>
+        <div id="drop-area">
+            <p>Drag & Drop Images Here</p>
+            <p>or click to upload</p>
+            <input type="file" id="upload" accept="image/*" multiple>
+        </div>
+        <br>
+        <button id="process">Process Images</button>
+        <a id="downloadLink" style="display:none;">Download</a>
+    </div>
 
+    <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
