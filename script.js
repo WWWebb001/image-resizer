@@ -153,7 +153,9 @@ processButton.addEventListener('click', async () => {
 restartButton.addEventListener('click', () => {
     allFiles = [];
     gallery.innerHTML = '';
-    downloadLink.style.display = 'none';
+    resetUI();
+    processButton.disabled = false;
+    restartButton.disabled = false;
 });
 
 function loadImage(file) {
