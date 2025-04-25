@@ -33,7 +33,7 @@ upload.addEventListener('change', (e) => {
 
 function handleFiles(files) {
     if (files.length > 0) {
-        downloadLink.style.display = 'none'; // hide the download button when new files are added
+        resetUI();
     }
     for (let file of files) {
         if (file.type.startsWith('image/')) {
@@ -57,7 +57,6 @@ function displayThumbnail(file) {
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, thumbCanvas.width, thumbCanvas.height);
 
-            // Calculate aspect ratio scaling
             const padding = 15;
             const maxWidth = thumbCanvas.width - 2 * padding;
             const maxHeight = thumbCanvas.height - 2 * padding;
@@ -115,39 +114,41 @@ processButton.addEventListener('click', async () => {
     restartButton.disabled = true;
     document.getElementById('spinner').classList.remove('hidden');
 
-    if (selectedFiles.length === 1) {
-        const img = await loadImage(selectedFiles[0]);
-        const processedImage = processImage(img);
-
-        const link = document.createElement('a');
-        link.download = 'processed-image.jpg';
-        link.href = processedImage;
-        link.click();
-    } else {
-        const zip = new JSZip();
-        for (let i = 0; i < selectedFiles.length; i++) {
-            const img = await loadImage(selectedFiles[i]);
+    try {
+        if (selectedFiles.length === 1) {
+            const img = await loadImage(selectedFiles[0]);
             const processedImage = processImage(img);
 
-            const data = processedImage.split(',')[1];
-            zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
+            const link = document.createElement('a');
+            link.download = 'processed-image.jpg';
+            link.href = processedImage;
+            link.click();
+        } else {
+            const zip = new JSZip();
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const img = await loadImage(selectedFiles[i]);
+                const processedImage = processImage(img);
+
+                const data = processedImage.split(',')[1];
+                zip.file(`processed-${i + 1}.jpg`, data, { base64: true });
+            }
+            const blob = await zip.generateAsync({ type: "blob" });
+            const zipLink = URL.createObjectURL(blob);
+
+            downloadLink.href = zipLink;
+            downloadLink.download = 'processed-images.zip';
+            downloadLink.style.display = 'inline-block';
+            downloadLink.innerText = 'Download Processed Images';
         }
-        const blob = await zip.generateAsync({ type: "blob" });
-        const zipLink = URL.createObjectURL(blob);
-
-        downloadLink.href = zipLink;
-        downloadLink.download = 'processed-images.zip';
-        downloadLink.style.display = 'inline-block';
-        downloadLink.innerText = 'Download Processed Images';
+    } catch (error) {
+        alert("Something went wrong while processing the images.");
+    } finally {
+        // Always hide spinner and re-enable buttons
+        document.getElementById('spinner').classList.add('hidden');
+        processButton.disabled = false;
+        restartButton.disabled = false;
+        showToast();
     }
-
-    // Hide spinner and re-enable buttons
-    document.getElementById('spinner').classList.add('hidden');
-    processButton.disabled = false;
-    restartButton.disabled = false;
-
-    // Show success toast
-    showToast();
 });
 
 restartButton.addEventListener('click', () => {
@@ -207,7 +208,7 @@ function showToast() {
     toast.classList.remove('hidden');
     setTimeout(() => {
         toast.classList.add('hidden');
-    }, 4000);
+    }, 3000);
 }
 
 function resetUI() {
