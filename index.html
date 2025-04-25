@@ -23,16 +23,13 @@
             <p>or <label for="upload" class="browse-button">browse files</label></p>
             <input type="file" id="upload" accept="image/*" multiple>
         </div>
-<div id="spinner" class="hidden">
-    <i class="fas fa-spinner fa-spin fa-3x"></i>
-    <p>Processing Images...</p>
-</div>
 
-<div id="toast" class="hidden">
-    <p>Images processed successfully!</p>
-</div>
-        <div id="gallery">
+        <div id="spinner" class="hidden">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+            <p>Processing Images...</p>
         </div>
+
+        <div id="gallery"></div>
 
         <div class="buttons">
             <button id="process"><i class="fas fa-cog"></i> Process Images</button>
@@ -46,6 +43,10 @@
     </footer>
 
     <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
+
+    <div id="toast" class="hidden">
+        <p>Images processed successfully!</p>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
     <script src="script.js"></script>
