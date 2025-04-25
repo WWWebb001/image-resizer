@@ -107,6 +107,11 @@ processButton.addEventListener('click', async () => {
         return;
     }
 
+    // Disable buttons and show spinner
+    processButton.disabled = true;
+    restartButton.disabled = true;
+    document.getElementById('spinner').classList.remove('hidden');
+
     if (selectedFiles.length === 1) {
         const img = await loadImage(selectedFiles[0]);
         const processedImage = processImage(img);
@@ -132,6 +137,14 @@ processButton.addEventListener('click', async () => {
         downloadLink.style.display = 'inline-block';
         downloadLink.innerText = 'Download Processed Images';
     }
+
+    // Hide spinner and re-enable buttons
+    document.getElementById('spinner').classList.add('hidden');
+    processButton.disabled = false;
+    restartButton.disabled = false;
+
+    // Show success toast
+    showToast();
 });
 
 restartButton.addEventListener('click', () => {
@@ -182,4 +195,12 @@ function processImage(img) {
     ctx.drawImage(img, x, y, width, height);
 
     return canvas.toDataURL('image/jpeg', 0.95);
+}
+
+function showToast() {
+    const toast = document.getElementById('toast');
+    toast.classList.remove('hidden');
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, 4000);
 }
