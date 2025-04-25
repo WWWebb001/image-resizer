@@ -32,6 +32,9 @@ upload.addEventListener('change', (e) => {
 });
 
 function handleFiles(files) {
+    if (files.length > 0) {
+        downloadLink.style.display = 'none'; // hide the download button when new files are added
+    }
     for (let file of files) {
         if (file.type.startsWith('image/')) {
             allFiles.push(file);
