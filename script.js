@@ -44,6 +44,7 @@ const gallerySpeaker = document.getElementById('gallery-speaker');
 const downloadButtonSpeaker = document.getElementById('downloadLink-speaker');
 const restartButtonSpeaker = document.getElementById('restart-speaker');
 const spinnerSpeaker = document.getElementById('spinner-speaker');
+let originalEditData = null;
 
 let speakerFiles = [];
 let speakerEditData = [];
@@ -240,6 +241,9 @@ function displaySpeakerThumbnail(file, index) {
 }
 
 function openEditor(index) {
+    originalEditData = { 
+        ...speakerEditData[index] 
+    };
     currentEditIndex = index;
     const reader = new FileReader();
     reader.onload = e => {
@@ -247,6 +251,11 @@ function openEditor(index) {
         imgToEdit.onload = () => {
             drawEditCanvas();
             editModal.classList.remove('hidden');
+        };
+        imgToEdit.src = e.target.result;
+    };
+    reader.readAsDataURL(speakerFiles[index]);
+}
         };
         imgToEdit.src = e.target.result;
     };
@@ -276,6 +285,9 @@ doneEditingButton.addEventListener('click', () => {
 });
 
 cancelEditingButton.addEventListener('click', () => {
+    if (originalEditData) {
+        speakerEditData[currentEditIndex] = { ...originalEditData };
+    }
     editModal.classList.add('hidden');
 });
 
