@@ -165,7 +165,7 @@ footer {
     gap: 20px;
 }
 
-.buttons button, .buttons a {
+.buttons button {
     background: #3498db;
     color: white;
     padding: 12px 20px;
@@ -176,6 +176,7 @@ footer {
     cursor: pointer;
     transition: background 0.2s ease;
 }
+
 
 .buttons button:hover {
     background: #2980b9;
