@@ -190,23 +190,20 @@ function displaySpeakerThumbnail(file, index) {
             let offsetX = 0;
             let offsetY = 0;
             const canvasSize = 591;
-            const zoomBuffer = 1.1; // 10% zoom buffer
+            const zoomBuffer = 1.1;
 
             if (img.width > img.height) {
-                // LANDSCAPE image: Fit to height
                 scale = (canvasSize / img.height) * zoomBuffer;
                 offsetX = (canvasSize - img.width * scale) / 2;
-                offsetY = 0; // Top align
+                offsetY = 0;
             } else {
-                // PORTRAIT image: Fit to width
                 scale = (canvasSize / img.width) * zoomBuffer;
                 offsetX = (canvasSize - img.width * scale) / 2;
-                offsetY = (canvasSize - img.height * scale) / 2; // Centre vertically
+                offsetY = (canvasSize - img.height * scale) / 2;
             }
 
             speakerEditData[index] = { offsetX, offsetY, scale };
 
-            // Now update the thumbnail view
             const thumbCanvas = document.createElement('canvas');
             thumbCanvas.width = 300;
             thumbCanvas.height = 300;
@@ -255,7 +252,6 @@ function openEditor(index) {
         imgToEdit.src = e.target.result;
     };
     reader.readAsDataURL(speakerFiles[index]);
-    
 }
 
 function drawEditCanvas() {
@@ -263,6 +259,18 @@ function drawEditCanvas() {
     editCtx.fillStyle = 'white';
     editCtx.fillRect(0, 0, 591, 591);
     editCtx.drawImage(imgToEdit, offsetX, offsetY, imgToEdit.width * scale, imgToEdit.height * scale);
+
+    // NEW: Border colour detection
+    if (
+        offsetX > 0 || 
+        offsetY > 0 || 
+        offsetX + imgToEdit.width * scale < 591 || 
+        offsetY + imgToEdit.height * scale < 591
+    ) {
+        editCanvas.style.border = "2px solid red";
+    } else {
+        editCanvas.style.border = "2px solid black";
+    }
 }
 
 zoomInButton.addEventListener('click', () => {
