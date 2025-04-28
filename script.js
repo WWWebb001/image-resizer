@@ -1,4 +1,4 @@
-// Tabs Switching
+// Tabs
 const logoTab = document.getElementById('logo-tab');
 const speakerTab = document.getElementById('speaker-tab');
 const logoArea = document.getElementById('logo-area');
@@ -27,7 +27,7 @@ const toast = document.getElementById('toast');
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
-// Logo Elements
+// Logo Area Elements
 const uploadLogo = document.getElementById('upload-logo');
 const dropAreaLogo = document.getElementById('drop-area-logo');
 const galleryLogo = document.getElementById('gallery-logo');
@@ -38,7 +38,7 @@ const spinnerLogo = document.getElementById('spinner-logo');
 
 let logoFiles = [];
 
-// Speaker Elements
+// Speaker Area Elements
 const uploadSpeaker = document.getElementById('upload-speaker');
 const dropAreaSpeaker = document.getElementById('drop-area-speaker');
 const gallerySpeaker = document.getElementById('gallery-speaker');
@@ -53,7 +53,19 @@ let speakerThumbnails = [];
 let currentEditIndex = null;
 let imgToEdit = null;
 
-// Logo Upload
+// Edit Modal Elements
+const editModal = document.getElementById('edit-modal');
+const editCanvas = document.getElementById('edit-canvas');
+const editCtx = editCanvas.getContext('2d');
+const zoomInButton = document.getElementById('zoom-in');
+const zoomOutButton = document.getElementById('zoom-out');
+const doneEditingButton = document.getElementById('done-editing');
+
+let dragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+
+// Logo Upload Handlers
 dropAreaLogo.addEventListener('click', () => uploadLogo.click());
 dropAreaLogo.addEventListener('dragover', e => { e.preventDefault(); });
 dropAreaLogo.addEventListener('drop', e => {
@@ -154,7 +166,7 @@ function processLogo(img) {
     return canvas.toDataURL('image/png');
 }
 
-// Speaker Upload
+// Speaker Upload Handlers
 dropAreaSpeaker.addEventListener('click', () => uploadSpeaker.click());
 dropAreaSpeaker.addEventListener('dragover', e => { e.preventDefault(); });
 dropAreaSpeaker.addEventListener('drop', e => {
@@ -168,39 +180,35 @@ function handleSpeakerFiles(files) {
         if (file.type.startsWith('image/')) {
             const index = speakerFiles.length;
             speakerFiles.push(file);
-            speakerEditData.push({ offsetX: 0, offsetY: 0, scale: 1 });
-            displaySpeakerThumbnail(file, index, true);
+            displaySpeakerThumbnail(file, index);
         }
     }
 }
 
-function displaySpeakerThumbnail(file, index, initial = false) {
+function displaySpeakerThumbnail(file, index) {
     const reader = new FileReader();
     reader.onload = e => {
         const img = new Image();
         img.onload = () => {
             let scale;
+            let offsetX = 0;
+            let offsetY = 0;
             if (img.width > img.height) {
                 scale = (591 / img.height) * 1.1;
+                offsetX = (591 - img.width * scale) / 2;
             } else {
                 scale = (591 / img.width) * 1.1;
+                offsetY = 0;
+                offsetX = (591 - img.width * scale) / 2;
             }
-            speakerEditData[index] = { offsetX: 0, offsetY: 0, scale };
 
-            const thumbCanvas = document.createElement('canvas');
-            thumbCanvas.width = 300;
-            thumbCanvas.height = 300;
-            const thumbCtx = thumbCanvas.getContext('2d');
-            thumbCtx.fillStyle = 'white';
-            thumbCtx.fillRect(0, 0, 300, 300);
-            thumbCtx.drawImage(img, 0, 0, img.width * scale * (300/591), img.height * scale * (300/591));
-
+            speakerEditData[index] = { offsetX, offsetY, scale };
             const thumb = document.createElement('div');
             thumb.className = 'thumb';
             thumb.innerHTML = `
-                <img src="${thumbCanvas.toDataURL('image/png')}">
+                <img src="${e.target.result}">
                 <input type="checkbox" checked>
-                <button class="edit-button" data-index="${index}">&#9998;</button>
+                <button class="edit-button" data-index="${index}"><i class="fas fa-pencil-alt"></i></button>
             `;
             gallerySpeaker.appendChild(thumb);
             speakerThumbnails[index] = thumb.querySelector('img');
@@ -219,7 +227,7 @@ function openEditor(index) {
         imgToEdit = new Image();
         imgToEdit.onload = () => {
             drawEditCanvas();
-            document.getElementById('edit-modal').classList.remove('hidden');
+            editModal.classList.remove('hidden');
         };
         imgToEdit.src = e.target.result;
     };
@@ -228,42 +236,67 @@ function openEditor(index) {
 
 function drawEditCanvas() {
     const { offsetX, offsetY, scale } = speakerEditData[currentEditIndex];
-    const editCanvas = document.getElementById('edit-canvas');
-    const editCtx = editCanvas.getContext('2d');
     editCtx.fillStyle = 'white';
     editCtx.fillRect(0, 0, 591, 591);
     editCtx.drawImage(imgToEdit, offsetX, offsetY, imgToEdit.width * scale, imgToEdit.height * scale);
 }
 
-// Zoom and Pan
-document.getElementById('zoom-in').addEventListener('click', () => {
+zoomInButton.addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale *= 1.07;
     drawEditCanvas();
 });
 
-document.getElementById('zoom-out').addEventListener('click', () => {
+zoomOutButton.addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale /= 1.07;
     drawEditCanvas();
 });
 
-document.getElementById('done-editing').addEventListener('click', () => {
-    document.getElementById('edit-modal').classList.add('hidden');
+doneEditingButton.addEventListener('click', () => {
+    editModal.classList.add('hidden');
     updateSpeakerThumbnail(currentEditIndex);
 });
 
+editCanvas.addEventListener('mousedown', (e) => {
+    dragging = true;
+    dragStartX = e.offsetX;
+    dragStartY = e.offsetY;
+});
+
+editCanvas.addEventListener('mousemove', (e) => {
+    if (dragging) {
+        const dx = e.offsetX - dragStartX;
+        const dy = e.offsetY - dragStartY;
+        speakerEditData[currentEditIndex].offsetX += dx;
+        speakerEditData[currentEditIndex].offsetY += dy;
+        dragStartX = e.offsetX;
+        dragStartY = e.offsetY;
+        drawEditCanvas();
+    }
+});
+
+editCanvas.addEventListener('mouseup', () => dragging = false);
+editCanvas.addEventListener('mouseleave', () => dragging = false);
+
 function updateSpeakerThumbnail(index) {
-    const { offsetX, offsetY, scale } = speakerEditData[index];
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 300;
-    tempCanvas.height = 300;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.fillStyle = 'white';
-    tempCtx.fillRect(0, 0, 300, 300);
-    tempCtx.drawImage(imgToEdit, offsetX * (300/591), offsetY * (300/591), imgToEdit.width * scale * (300/591), imgToEdit.height * scale * (300/591));
-    speakerThumbnails[index].src = tempCanvas.toDataURL('image/png');
+    const reader = new FileReader();
+    reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+            const thumbCanvas = document.createElement('canvas');
+            thumbCanvas.width = 300;
+            thumbCanvas.height = 300;
+            const thumbCtx = thumbCanvas.getContext('2d');
+            const { offsetX, offsetY, scale } = speakerEditData[index];
+            thumbCtx.fillStyle = 'white';
+            thumbCtx.fillRect(0, 0, 300, 300);
+            thumbCtx.drawImage(img, offsetX * (300/591), offsetY * (300/591), img.width * scale * (300/591), img.height * scale * (300/591));
+            speakerThumbnails[index].src = thumbCanvas.toDataURL('image/png');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(speakerFiles[index]);
 }
 
-// Speaker Processing
 processButtonSpeaker.addEventListener('click', async () => {
     const selected = speakerFiles.filter((_, i) => gallerySpeaker.querySelectorAll('input')[i].checked);
     if (selected.length === 0) {
@@ -296,7 +329,6 @@ restartButtonSpeaker.addEventListener('click', () => {
     downloadLinkSpeaker.style.display = 'none';
 });
 
-// Speaker Processing
 function processSpeaker(img, { offsetX, offsetY, scale }) {
     canvas.width = 591;
     canvas.height = 591;
@@ -306,7 +338,7 @@ function processSpeaker(img, { offsetX, offsetY, scale }) {
     return canvas.toDataURL('image/png');
 }
 
-// Helpers
+// Utilities
 function loadImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
