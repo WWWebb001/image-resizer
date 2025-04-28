@@ -6,6 +6,7 @@
     <title>Image Resizer Pro</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
@@ -20,52 +21,43 @@
 </div>
 
 <main class="container">
-    <!-- Logo Resizer -->
     <section id="logo-area" class="active-area">
         <div id="drop-area-logo" class="drop-area">
             <p><strong>Drag and drop your logos here</strong></p>
             <p>or <label for="upload-logo" class="browse-button">browse files</label></p>
             <input type="file" id="upload-logo" accept="image/*" multiple>
         </div>
-
         <div id="gallery-logo"></div>
-
         <div class="buttons">
             <button id="process-logo">Process Logos</button>
             <button id="restart-logo">Restart</button>
             <a id="downloadLink-logo" style="display:none;">Download Logos</a>
         </div>
-
         <div id="spinner-logo" class="spinner hidden"></div>
     </section>
 
-    <!-- Speaker Resizer -->
     <section id="speaker-area" class="hidden-area">
         <div id="drop-area-speaker" class="drop-area">
             <p><strong>Drag and drop speaker photos here</strong></p>
             <p>or <label for="upload-speaker" class="browse-button">browse files</label></p>
             <input type="file" id="upload-speaker" accept="image/*" multiple>
         </div>
-
         <div id="gallery-speaker"></div>
-
         <div class="buttons">
             <button id="process-speaker">Process Speakers</button>
             <button id="restart-speaker">Restart</button>
             <a id="downloadLink-speaker" style="display:none;">Download Speakers</a>
         </div>
-
         <div id="spinner-speaker" class="spinner hidden"></div>
     </section>
 </main>
 
-<!-- Modal for Editing -->
 <div id="edit-modal" class="hidden">
     <div class="edit-content">
         <canvas id="edit-canvas" width="591" height="591"></canvas>
         <div class="edit-buttons">
-            <button id="zoom-in">Zoom In</button>
-            <button id="zoom-out">Zoom Out</button>
+            <button id="zoom-in"><i class="fas fa-search-plus"></i></button>
+            <button id="zoom-out"><i class="fas fa-search-minus"></i></button>
             <button id="done-editing">Done</button>
         </div>
     </div>
