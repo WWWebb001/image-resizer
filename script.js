@@ -58,6 +58,7 @@ const editCtx = editCanvas.getContext('2d');
 const zoomInButton = document.getElementById('zoom-in');
 const zoomOutButton = document.getElementById('zoom-out');
 const doneEditingButton = document.getElementById('done-editing');
+const cancelEditingButton = document.getElementById('cancel-editing');
 
 let dragging = false;
 let dragStartX = 0;
@@ -272,6 +273,10 @@ zoomOutButton.addEventListener('click', () => {
 doneEditingButton.addEventListener('click', () => {
     editModal.classList.add('hidden');
     updateSpeakerThumbnail(currentEditIndex);
+});
+
+cancelEditingButton.addEventListener('click', () => {
+    editModal.classList.add('hidden');
 });
 
 editCanvas.addEventListener('mousedown', (e) => {
