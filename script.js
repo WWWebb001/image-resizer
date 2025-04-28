@@ -260,11 +260,9 @@ function drawEditCanvas() {
     editCtx.fillRect(0, 0, 591, 591);
     editCtx.drawImage(imgToEdit, offsetX, offsetY, imgToEdit.width * scale, imgToEdit.height * scale);
 
-    // NEW: Border colour detection
     if (
-        offsetX > 0 || 
-        offsetY > 0 || 
-        offsetX + imgToEdit.width * scale < 591 || 
+        offsetX > 0 || offsetY > 0 ||
+        offsetX + imgToEdit.width * scale < 591 ||
         offsetY + imgToEdit.height * scale < 591
     ) {
         editCanvas.style.border = "2px solid red";
@@ -272,6 +270,27 @@ function drawEditCanvas() {
         editCanvas.style.border = "2px solid black";
     }
 }
+
+// 👇 DRAGGING – GLOBAL mouse tracking fix:
+editCanvas.addEventListener('mousedown', (e) => {
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (dragging) {
+        const dx = e.clientX - dragStartX;
+        const dy = e.clientY - dragStartY;
+        speakerEditData[currentEditIndex].offsetX += dx;
+        speakerEditData[currentEditIndex].offsetY += dy;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        drawEditCanvas();
+    }
+});
+
+document.addEventListener('mouseup', () => dragging = false);
 
 zoomInButton.addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale *= 1.07;
@@ -294,27 +313,6 @@ cancelEditingButton.addEventListener('click', () => {
     }
     editModal.classList.add('hidden');
 });
-
-editCanvas.addEventListener('mousedown', (e) => {
-    dragging = true;
-    dragStartX = e.offsetX;
-    dragStartY = e.offsetY;
-});
-
-editCanvas.addEventListener('mousemove', (e) => {
-    if (dragging) {
-        const dx = e.offsetX - dragStartX;
-        const dy = e.offsetY - dragStartY;
-        speakerEditData[currentEditIndex].offsetX += dx;
-        speakerEditData[currentEditIndex].offsetY += dy;
-        dragStartX = e.offsetX;
-        dragStartY = e.offsetY;
-        drawEditCanvas();
-    }
-});
-
-editCanvas.addEventListener('mouseup', () => dragging = false);
-editCanvas.addEventListener('mouseleave', () => dragging = false);
 
 function updateSpeakerThumbnail(index) {
     const reader = new FileReader();
