@@ -342,7 +342,7 @@ function drawEditCanvas() {
     editCanvas.style.border = overflow ? CONFIG.editBorder.warning : CONFIG.editBorder.normal;
 }
 
-// Dragging across the whole document
+// Dragging
 editCanvas.addEventListener('mousedown', (e) => {
     dragging = true;
     dragStartX = e.clientX;
