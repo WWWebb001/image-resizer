@@ -71,21 +71,25 @@ let dragStartX = 0;
 let dragStartY = 0;
 
 // ===================
-// NAVIGATION
+// NAVIGATION (FIXED)
 // ===================
 
 logoTab.addEventListener('click', () => {
     logoTab.classList.add('active');
     speakerTab.classList.remove('active');
+    logoArea.classList.remove('hidden-area');
     logoArea.classList.add('active-area');
     speakerArea.classList.add('hidden-area');
+    speakerArea.classList.remove('active-area');
 });
 
 speakerTab.addEventListener('click', () => {
     speakerTab.classList.add('active');
     logoTab.classList.remove('active');
+    speakerArea.classList.remove('hidden-area');
     speakerArea.classList.add('active-area');
     logoArea.classList.add('hidden-area');
+    logoArea.classList.remove('active-area');
 });
 
 // ===================
