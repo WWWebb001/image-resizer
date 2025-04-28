@@ -187,29 +187,37 @@ function displaySpeakerThumbnail(file, index) {
             let scale;
             let offsetX = 0;
             let offsetY = 0;
+            const canvasSize = 591;
+            const zoomBuffer = 1.1; // 10% zoom buffer
+
             if (img.width > img.height) {
-                scale = (591 / img.height) * 1.1;
-                offsetX = (591 - img.width * scale) / 2;
+                // LANDSCAPE image: Fit to height
+                scale = (canvasSize / img.height) * zoomBuffer;
+                offsetX = (canvasSize - img.width * scale) / 2;
+                offsetY = 0; // Top align
             } else {
-                scale = (591 / img.width) * 1.1;
-                offsetY = 0;
-                offsetX = (591 - img.width * scale) / 2;
+                // PORTRAIT image: Fit to width
+                scale = (canvasSize / img.width) * zoomBuffer;
+                offsetX = (canvasSize - img.width * scale) / 2;
+                offsetY = (canvasSize - img.height * scale) / 2; // Centre vertically
             }
 
             speakerEditData[index] = { offsetX, offsetY, scale };
 
+            // Now update the thumbnail view
             const thumbCanvas = document.createElement('canvas');
             thumbCanvas.width = 300;
             thumbCanvas.height = 300;
             const thumbCtx = thumbCanvas.getContext('2d');
             thumbCtx.fillStyle = 'white';
             thumbCtx.fillRect(0, 0, 300, 300);
+
             thumbCtx.drawImage(
                 img,
-                offsetX * (300 / 591),
-                offsetY * (300 / 591),
-                img.width * scale * (300 / 591),
-                img.height * scale * (300 / 591)
+                offsetX * (300 / canvasSize),
+                offsetY * (300 / canvasSize),
+                img.width * scale * (300 / canvasSize),
+                img.height * scale * (300 / canvasSize)
             );
 
             const thumb = document.createElement('div');
@@ -220,6 +228,7 @@ function displaySpeakerThumbnail(file, index) {
                 <button class="edit-button" data-index="${index}"><i class="fas fa-pencil-alt"></i></button>
             `;
             gallerySpeaker.appendChild(thumb);
+
             speakerThumbnails[index] = thumb.querySelector('img');
 
             thumb.querySelector('.edit-button').addEventListener('click', () => openEditor(index));
