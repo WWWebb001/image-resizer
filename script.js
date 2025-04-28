@@ -31,9 +31,8 @@ const ctx = canvas.getContext('2d');
 const uploadLogo = document.getElementById('upload-logo');
 const dropAreaLogo = document.getElementById('drop-area-logo');
 const galleryLogo = document.getElementById('gallery-logo');
-const processButtonLogo = document.getElementById('process-logo');
+const downloadButtonLogo = document.getElementById('downloadLink-logo');
 const restartButtonLogo = document.getElementById('restart-logo');
-const downloadLinkLogo = document.getElementById('downloadLink-logo');
 const spinnerLogo = document.getElementById('spinner-logo');
 
 let logoFiles = [];
@@ -42,9 +41,8 @@ let logoFiles = [];
 const uploadSpeaker = document.getElementById('upload-speaker');
 const dropAreaSpeaker = document.getElementById('drop-area-speaker');
 const gallerySpeaker = document.getElementById('gallery-speaker');
-const processButtonSpeaker = document.getElementById('process-speaker');
+const downloadButtonSpeaker = document.getElementById('downloadLink-speaker');
 const restartButtonSpeaker = document.getElementById('restart-speaker');
-const downloadLinkSpeaker = document.getElementById('downloadLink-speaker');
 const spinnerSpeaker = document.getElementById('spinner-speaker');
 
 let speakerFiles = [];
@@ -65,9 +63,9 @@ let dragging = false;
 let dragStartX = 0;
 let dragStartY = 0;
 
-// Logo Upload Handlers
+// Drag and Drop Logo
 dropAreaLogo.addEventListener('click', () => uploadLogo.click());
-dropAreaLogo.addEventListener('dragover', e => { e.preventDefault(); });
+dropAreaLogo.addEventListener('dragover', e => e.preventDefault());
 dropAreaLogo.addEventListener('drop', e => {
     e.preventDefault();
     handleLogoFiles(e.dataTransfer.files);
@@ -99,30 +97,27 @@ function displayLogoThumbnail(file) {
     reader.readAsDataURL(file);
 }
 
-processButtonLogo.addEventListener('click', async () => {
-    const selected = logoFiles.filter((_, i) => galleryLogo.querySelectorAll('input')[i].checked);
-    if (selected.length === 0) {
-        alert("Please select at least one logo to process.");
-        return;
-    }
+downloadButtonLogo.addEventListener('click', async () => {
+    const selectedIndexes = logoFiles.map((_, i) => i).filter(i => galleryLogo.querySelectorAll('input')[i].checked);
+    if (selectedIndexes.length === 0) return alert("Please select at least one logo.");
+
     spinnerLogo.classList.remove('hidden');
     try {
-        if (selected.length === 1) {
-            const img = await loadImage(selected[0]);
+        if (selectedIndexes.length === 1) {
+            const file = logoFiles[selectedIndexes[0]];
+            const img = await loadImage(file);
             const processed = processLogo(img);
-            triggerDownload(processed, 'processed-logo.png');
+            triggerDownload(processed, getFilename(file.name, '_350x200'));
         } else {
             const zip = new JSZip();
-            for (let i = 0; i < selected.length; i++) {
-                const img = await loadImage(selected[i]);
+            for (let idx of selectedIndexes) {
+                const file = logoFiles[idx];
+                const img = await loadImage(file);
                 const processed = processLogo(img);
-                zip.file(`processed-logo-${i + 1}.png`, processed.split(',')[1], { base64: true });
+                zip.file(getFilename(file.name, '_350x200'), processed.split(',')[1], { base64: true });
             }
             const blob = await zip.generateAsync({ type: 'blob' });
-            const url = URL.createObjectURL(blob);
-            downloadLinkLogo.href = url;
-            downloadLinkLogo.download = 'processed-logos.zip';
-            downloadLinkLogo.style.display = 'inline-block';
+            triggerZipDownload(blob, 'processed-logos.zip');
         }
     } finally {
         spinnerLogo.classList.add('hidden');
@@ -133,7 +128,6 @@ processButtonLogo.addEventListener('click', async () => {
 restartButtonLogo.addEventListener('click', () => {
     logoFiles = [];
     galleryLogo.innerHTML = '';
-    downloadLinkLogo.style.display = 'none';
 });
 
 // Logo Processing
@@ -166,9 +160,9 @@ function processLogo(img) {
     return canvas.toDataURL('image/png');
 }
 
-// Speaker Upload Handlers
+// Drag and Drop Speaker
 dropAreaSpeaker.addEventListener('click', () => uploadSpeaker.click());
-dropAreaSpeaker.addEventListener('dragover', e => { e.preventDefault(); });
+dropAreaSpeaker.addEventListener('dragover', e => e.preventDefault());
 dropAreaSpeaker.addEventListener('drop', e => {
     e.preventDefault();
     handleSpeakerFiles(e.dataTransfer.files);
@@ -204,17 +198,12 @@ function displaySpeakerThumbnail(file, index) {
 
             speakerEditData[index] = { offsetX, offsetY, scale };
 
-            // 🖼 Create a small thumbnail canvas
             const thumbCanvas = document.createElement('canvas');
             thumbCanvas.width = 300;
             thumbCanvas.height = 300;
             const thumbCtx = thumbCanvas.getContext('2d');
-
-            // Fill background
             thumbCtx.fillStyle = 'white';
             thumbCtx.fillRect(0, 0, 300, 300);
-
-            // Draw image using scaled + offset values
             thumbCtx.drawImage(
                 img,
                 offsetX * (300 / 591),
@@ -317,26 +306,21 @@ function updateSpeakerThumbnail(index) {
     reader.readAsDataURL(speakerFiles[index]);
 }
 
-processButtonSpeaker.addEventListener('click', async () => {
-    const selected = speakerFiles.filter((_, i) => gallerySpeaker.querySelectorAll('input')[i].checked);
-    if (selected.length === 0) {
-        alert("Please select at least one speaker image.");
-        return;
-    }
+downloadButtonSpeaker.addEventListener('click', async () => {
+    const selectedIndexes = speakerFiles.map((_, i) => i).filter(i => gallerySpeaker.querySelectorAll('input')[i].checked);
+    if (selectedIndexes.length === 0) return alert("Please select at least one speaker image.");
+
     spinnerSpeaker.classList.remove('hidden');
     try {
         const zip = new JSZip();
-        for (let i = 0; i < speakerFiles.length; i++) {
-            if (!gallerySpeaker.querySelectorAll('input')[i].checked) continue;
-            const img = await loadImage(speakerFiles[i]);
-            const processed = processSpeaker(img, speakerEditData[i]);
-            zip.file(`processed-speaker-${i + 1}.png`, processed.split(',')[1], { base64: true });
+        for (let idx of selectedIndexes) {
+            const file = speakerFiles[idx];
+            const img = await loadImage(file);
+            const processed = processSpeaker(img, speakerEditData[idx]);
+            zip.file(getFilename(file.name, '_591x591'), processed.split(',')[1], { base64: true });
         }
         const blob = await zip.generateAsync({ type: 'blob' });
-        const url = URL.createObjectURL(blob);
-        downloadLinkSpeaker.href = url;
-        downloadLinkSpeaker.download = 'processed-speakers.zip';
-        downloadLinkSpeaker.style.display = 'inline-block';
+        triggerZipDownload(blob, 'processed-speakers.zip');
     } finally {
         spinnerSpeaker.classList.add('hidden');
         showToast();
@@ -346,9 +330,9 @@ processButtonSpeaker.addEventListener('click', async () => {
 restartButtonSpeaker.addEventListener('click', () => {
     speakerFiles = [];
     gallerySpeaker.innerHTML = '';
-    downloadLinkSpeaker.style.display = 'none';
 });
 
+// Processing speakers
 function processSpeaker(img, { offsetX, offsetY, scale }) {
     canvas.width = 591;
     canvas.height = 591;
@@ -377,6 +361,16 @@ function triggerDownload(dataUrl, filename) {
     link.href = dataUrl;
     link.download = filename;
     link.click();
+}
+
+function triggerZipDownload(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    triggerDownload(url, filename);
+}
+
+function getFilename(name, suffix) {
+    const base = name.substring(0, name.lastIndexOf('.')) || name;
+    return `${base}${suffix}.png`;
 }
 
 function showToast() {
