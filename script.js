@@ -197,10 +197,10 @@ function createSpeakerThumbnail(file, index, initial = false) {
         img.onload = () => {
             let scale, offsetX = 0, offsetY = 0;
             if (img.width > img.height) {
-                scale = 591 / img.height;
+                scale = (591 + 10) / img.height;
                 offsetX = (591 - img.width * scale) / 2;
             } else {
-                scale = 591 / img.width;
+                scale = (591 + 10) / img.width;
                 offsetY = 0;
             }
 
@@ -241,10 +241,10 @@ function openEditor(index) {
         imgToEdit.onload = () => {
             let scale, offsetX = 0, offsetY = 0;
             if (imgToEdit.width > imgToEdit.height) {
-                scale = 591 / imgToEdit.height;
+                scale = (591 + 10) / imgToEdit.height;
                 offsetX = (591 - imgToEdit.width * scale) / 2;
             } else {
-                scale = 591 / imgToEdit.width;
+                scale = (591 + 10) / imgToEdit.width;
                 offsetY = 0;
             }
             speakerEditData[index] = { offsetX, offsetY, scale };
@@ -286,11 +286,11 @@ editCanvas.addEventListener('mousemove', e => {
 });
 
 zoomInButton.addEventListener('click', () => {
-    speakerEditData[currentEditIndex].scale *= 1.1;
+    speakerEditData[currentEditIndex].scale *= 1.07;
     drawEditCanvas();
 });
 zoomOutButton.addEventListener('click', () => {
-    speakerEditData[currentEditIndex].scale /= 1.1;
+    speakerEditData[currentEditIndex].scale /= 1.07;
     drawEditCanvas();
 });
 
