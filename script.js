@@ -1,15 +1,14 @@
 // ===================
 // CONFIGURATION
 // ===================
-
 const CONFIG = {
     logoCanvas: { width: 350, height: 200, padding: 15 },
     speakerCanvas: { size: 591, thumbSize: 300 },
-    zoomBuffer: 1.1,       // 10% zoom on initial speaker images
-    zoomStep: 1.07,         // Zoom increment (7% per click)
+    zoomBuffer: 1.1,
+    zoomStep: 1.07,
     alignment: {
-        landscape: "top-center",    // Options: top-center, center, bottom-center
-        portrait: "center"          // Options: top-center, center, bottom-center
+        landscape: "top-center",
+        portrait: "center"
     },
     editBorder: {
         normal: "4px solid green",
@@ -71,25 +70,21 @@ let dragStartX = 0;
 let dragStartY = 0;
 
 // ===================
-// NAVIGATION (FIXED)
+// NAVIGATION
 // ===================
 
 logoTab.addEventListener('click', () => {
     logoTab.classList.add('active');
     speakerTab.classList.remove('active');
-    logoArea.classList.remove('hidden-area');
-    logoArea.classList.add('active-area');
-    speakerArea.classList.add('hidden-area');
-    speakerArea.classList.remove('active-area');
+    logoArea.style.display = 'block';
+    speakerArea.style.display = 'none';
 });
 
 speakerTab.addEventListener('click', () => {
     speakerTab.classList.add('active');
     logoTab.classList.remove('active');
-    speakerArea.classList.remove('hidden-area');
-    speakerArea.classList.add('active-area');
-    logoArea.classList.add('hidden-area');
-    logoArea.classList.remove('active-area');
+    speakerArea.style.display = 'block';
+    logoArea.style.display = 'none';
 });
 
 // ===================
@@ -123,7 +118,11 @@ function triggerDownload(dataUrl, filename) {
 
 function triggerZipDownload(blob, filename) {
     const url = URL.createObjectURL(blob);
-    triggerDownload(url, filename);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
 }
 
 function showToast() {
@@ -189,8 +188,8 @@ function processLogo(img) {
     canvas.width = CONFIG.logoCanvas.width;
     canvas.height = CONFIG.logoCanvas.height;
     const padding = CONFIG.logoCanvas.padding;
-    const maxWidth = CONFIG.logoCanvas.width - padding * 2;
-    const maxHeight = CONFIG.logoCanvas.height - padding * 2;
+    const maxWidth = canvas.width - padding * 2;
+    const maxHeight = canvas.height - padding * 2;
 
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -221,22 +220,15 @@ downloadButtonLogo.addEventListener('click', async () => {
 
     spinnerLogo.classList.remove('hidden');
     try {
-        if (selected.length === 1) {
-            const file = logoFiles[selected[0]];
+        const zip = new JSZip();
+        for (let idx of selected) {
+            const file = logoFiles[idx];
             const img = await loadImage(file);
             const processed = processLogo(img);
-            triggerDownload(processed, getFilename(file.name, '_350x200'));
-        } else {
-            const zip = new JSZip();
-            for (let idx of selected) {
-                const file = logoFiles[idx];
-                const img = await loadImage(file);
-                const processed = processLogo(img);
-                zip.file(getFilename(file.name, '_350x200'), processed.split(',')[1], { base64: true });
-            }
-            const blob = await zip.generateAsync({ type: 'blob' });
-            triggerZipDownload(blob, 'processed-logos.zip');
+            zip.file(getFilename(file.name, '_350x200'), processed.split(',')[1], { base64: true });
         }
+        const blob = await zip.generateAsync({ type: 'blob' });
+        triggerZipDownload(blob, 'processed-logos.zip');
     } finally {
         spinnerLogo.classList.add('hidden');
         showToast();
@@ -341,12 +333,11 @@ function drawEditCanvas() {
     editCtx.drawImage(imgToEdit, offsetX, offsetY, imgToEdit.width * scale, imgToEdit.height * scale);
 
     const overflow = offsetX > 0 || offsetY > 0 ||
-                     offsetX + imgToEdit.width * scale < CONFIG.speakerCanvas.size ||
-                     offsetY + imgToEdit.height * scale < CONFIG.speakerCanvas.size;
+        offsetX + imgToEdit.width * scale < CONFIG.speakerCanvas.size ||
+        offsetY + imgToEdit.height * scale < CONFIG.speakerCanvas.size;
     editCanvas.style.border = overflow ? CONFIG.editBorder.warning : CONFIG.editBorder.normal;
 }
 
-// Dragging
 editCanvas.addEventListener('mousedown', (e) => {
     dragging = true;
     dragStartX = e.clientX;
@@ -369,14 +360,17 @@ zoomInButton.addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale *= CONFIG.zoomStep;
     drawEditCanvas();
 });
+
 zoomOutButton.addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale /= CONFIG.zoomStep;
     drawEditCanvas();
 });
+
 doneEditingButton.addEventListener('click', () => {
     editModal.classList.add('hidden');
     updateSpeakerThumbnail(currentEditIndex);
 });
+
 cancelEditingButton.addEventListener('click', () => {
     if (originalEditData) {
         speakerEditData[currentEditIndex] = { ...originalEditData };
