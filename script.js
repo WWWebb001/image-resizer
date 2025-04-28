@@ -203,10 +203,30 @@ function displaySpeakerThumbnail(file, index) {
             }
 
             speakerEditData[index] = { offsetX, offsetY, scale };
+
+            // 🖼 Create a small thumbnail canvas
+            const thumbCanvas = document.createElement('canvas');
+            thumbCanvas.width = 300;
+            thumbCanvas.height = 300;
+            const thumbCtx = thumbCanvas.getContext('2d');
+
+            // Fill background
+            thumbCtx.fillStyle = 'white';
+            thumbCtx.fillRect(0, 0, 300, 300);
+
+            // Draw image using scaled + offset values
+            thumbCtx.drawImage(
+                img,
+                offsetX * (300 / 591),
+                offsetY * (300 / 591),
+                img.width * scale * (300 / 591),
+                img.height * scale * (300 / 591)
+            );
+
             const thumb = document.createElement('div');
             thumb.className = 'thumb';
             thumb.innerHTML = `
-                <img src="${e.target.result}">
+                <img src="${thumbCanvas.toDataURL('image/png')}">
                 <input type="checkbox" checked>
                 <button class="edit-button" data-index="${index}"><i class="fas fa-pencil-alt"></i></button>
             `;
