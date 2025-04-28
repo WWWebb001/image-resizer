@@ -216,33 +216,52 @@ Footer {
 
 /* Modal */
 #edit-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 #edit-modal.hidden {
-    display: none;
+    display: none;
 }
 
 .edit-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 2px solid white; /* Added white border to the edit content */
+    text-align: center;
 }
 
 .edit-buttons {
-    margin-top: 15px;
+    margin-top: 15px;
+    font-size: 1.2em; /* Slightly increased font size for buttons */
+    display: flex; /* Arrange buttons in a row */
+    justify-content: center; /* Center the buttons */
+    gap: 15px; /* Add some space between the buttons */
 }
 
 .edit-buttons button {
-    margin: 0 10px;
+    /* Removed individual margin as gap is used now */
+    padding: 8px 12px; /* Add some padding to the buttons */
+    border-radius: 5px;
+    border: none;
+    background-color: #f0f0f0; /* Light background for buttons */
+    cursor: pointer;
+}
+
+.edit-buttons button i {
+    font-size: 1.5em; /* Increased icon size */
+}
+
+.edit-buttons button#done-editing {
+    background-color: #5cb85c; /* Green for the Done button */
+    color: white;
 }
