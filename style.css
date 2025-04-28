@@ -231,17 +231,16 @@ Footer {
 #edit-modal.hidden {
     display: none;
 }
+
 .edit-content {
     background: white;
     padding: 20px;
     border-radius: 10px;
-    border: 2px solid black; /* Correct way to define the border */
     text-align: center;
 }
 
 .edit-buttons {
     margin-top: 15px;
-    font-size: 10px; /* Sets the font size to 10 pixels */
 }
 
 .edit-buttons button {
