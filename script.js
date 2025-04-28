@@ -265,9 +265,9 @@ function drawEditCanvas() {
         offsetX + imgToEdit.width * scale < 591 ||
         offsetY + imgToEdit.height * scale < 591
     ) {
-        editCanvas.style.border = "2px solid red";
+        editCanvas.style.border = "4px solid red";
     } else {
-        editCanvas.style.border = "2px solid black";
+        editCanvas.style.border = "4px solid green";
     }
 }
 
