@@ -19,7 +19,6 @@ const mainCanvas = document.getElementById('canvas');
 const mainCtx = mainCanvas.getContext('2d');
 const toast = document.getElementById('toast');
 
-// Modal for editing
 const editModal = document.getElementById('edit-modal');
 const editCanvas = document.getElementById('edit-canvas');
 const editCtx = editCanvas.getContext('2d');
@@ -27,21 +26,18 @@ const zoomInButton = document.getElementById('zoom-in');
 const zoomOutButton = document.getElementById('zoom-out');
 const doneEditingButton = document.getElementById('done-editing');
 
-// Tabs
 const logoTab = document.getElementById('logo-tab');
 const speakerTab = document.getElementById('speaker-tab');
 const logoArea = document.getElementById('logo-area');
 const speakerArea = document.getElementById('speaker-area');
 
-// Data stores
 let logoFiles = [];
 let speakerFiles = [];
-let speakerEditData = []; // Array of { offsetX, offsetY, scale }
-let speakerThumbnails = []; // Track each speaker thumbnail DOM element
+let speakerEditData = [];
+let speakerThumbnails = [];
 let currentEditIndex = null;
 let imgToEdit = null;
 
-// Tab switching
 logoTab.addEventListener('click', () => {
     logoTab.classList.add('active');
     speakerTab.classList.remove('active');
@@ -55,8 +51,6 @@ speakerTab.addEventListener('click', () => {
     speakerArea.classList.add('active');
     logoArea.classList.remove('active');
 });
-
-// ---------- LOGO RESIZER ----------
 
 dropAreaLogo.addEventListener('click', () => uploadLogo.click());
 dropAreaLogo.addEventListener('dragover', e => { e.preventDefault(); dropAreaLogo.classList.add('highlight'); });
@@ -174,8 +168,6 @@ function processLogo(img) {
     return mainCanvas.toDataURL('image/png');
 }
 
-// ---------- SPEAKER PHOTO RESIZER ----------
-
 dropAreaSpeaker.addEventListener('click', () => uploadSpeaker.click());
 dropAreaSpeaker.addEventListener('dragover', e => { e.preventDefault(); dropAreaSpeaker.classList.add('highlight'); });
 dropAreaSpeaker.addEventListener('dragleave', e => { e.preventDefault(); dropAreaSpeaker.classList.remove('highlight'); });
@@ -203,22 +195,26 @@ function createSpeakerThumbnail(file, index, initial = false) {
     reader.onload = e => {
         const img = new Image();
         img.onload = () => {
-            let scale = 591 / img.width;
-            let scaledHeight = img.height * scale;
-            let offsetX = 0;
-            let offsetY = scaledHeight < 591 ? (591 - scaledHeight) / 2 : 0;
+            let scale, offsetX = 0, offsetY = 0;
+            if (img.width > img.height) {
+                scale = 591 / img.height;
+                offsetX = (591 - img.width * scale) / 2;
+            } else {
+                scale = 591 / img.width;
+                offsetY = 0;
+            }
 
             if (initial) {
                 speakerEditData[index] = { offsetX, offsetY, scale };
             }
 
             const thumbCanvas = document.createElement('canvas');
-            thumbCanvas.width = 150;
-            thumbCanvas.height = 150;
+            thumbCanvas.width = 300;
+            thumbCanvas.height = 300;
             const thumbCtx = thumbCanvas.getContext('2d');
             thumbCtx.fillStyle = 'white';
-            thumbCtx.fillRect(0, 0, 150, 150);
-            thumbCtx.drawImage(img, offsetX * (150 / 591), offsetY * (150 / 591), img.width * scale * (150 / 591), img.height * scale * (150 / 591));
+            thumbCtx.fillRect(0, 0, 300, 300);
+            thumbCtx.drawImage(img, offsetX * (300/591), offsetY * (300/591), img.width * scale * (300/591), img.height * scale * (300/591));
 
             const thumb = document.createElement('div');
             thumb.className = 'thumb';
@@ -243,12 +239,15 @@ function openEditor(index) {
     reader.onload = e => {
         imgToEdit = new Image();
         imgToEdit.onload = () => {
-            const initialScale = 591 / imgToEdit.width;
-            const scaledHeight = imgToEdit.height * initialScale;
-            let offsetX = 0;
-            let offsetY = scaledHeight < 591 ? (591 - scaledHeight) / 2 : 0;
-
-            speakerEditData[index] = { offsetX, offsetY, scale: initialScale };
+            let scale, offsetX = 0, offsetY = 0;
+            if (imgToEdit.width > imgToEdit.height) {
+                scale = 591 / imgToEdit.height;
+                offsetX = (591 - imgToEdit.width * scale) / 2;
+            } else {
+                scale = 591 / imgToEdit.width;
+                offsetY = 0;
+            }
+            speakerEditData[index] = { offsetX, offsetY, scale };
             drawEditCanvas();
             editModal.classList.remove('hidden');
         };
@@ -266,7 +265,6 @@ function drawEditCanvas() {
     editCtx.drawImage(imgToEdit, offsetX, offsetY, scaledWidth, scaledHeight);
 }
 
-// Drag and zoom in editor
 let isDragging = false;
 let lastX = 0, lastY = 0;
 
@@ -304,12 +302,12 @@ doneEditingButton.addEventListener('click', () => {
 function updateSpeakerThumbnail(index) {
     const { offsetX, offsetY, scale } = speakerEditData[index];
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 150;
-    tempCanvas.height = 150;
+    tempCanvas.width = 300;
+    tempCanvas.height = 300;
     const tempCtx = tempCanvas.getContext('2d');
     tempCtx.fillStyle = 'white';
-    tempCtx.fillRect(0, 0, 150, 150);
-    tempCtx.drawImage(imgToEdit, offsetX * (150/591), offsetY * (150/591), imgToEdit.width * scale * (150/591), imgToEdit.height * scale * (150/591));
+    tempCtx.fillRect(0, 0, 300, 300);
+    tempCtx.drawImage(imgToEdit, offsetX * (300/591), offsetY * (300/591), imgToEdit.width * scale * (300/591), imgToEdit.height * scale * (300/591));
     speakerThumbnails[index].src = tempCanvas.toDataURL('image/png');
 }
 
@@ -374,7 +372,6 @@ function processSpeaker(img, { offsetX, offsetY, scale }) {
     return mainCanvas.toDataURL('image/png');
 }
 
-// Utility
 function loadImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
