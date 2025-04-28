@@ -10,8 +10,8 @@
 <body>
 
 <header>
-    <h1><i class="fas fa-image"></i> Image Resizer Pro</h1>
-    <p>Resize your logos or speaker photos with style!</p>
+    <h1>Image Resizer Pro</h1>
+    <p>Resize logos and speaker photos easily!</p>
 </header>
 
 <div class="tabs">
@@ -20,6 +20,7 @@
 </div>
 
 <main class="container">
+    <!-- Logo Resizer -->
     <section id="logo-area" class="active-area">
         <div id="drop-area-logo" class="drop-area">
             <p><strong>Drag and drop your logos here</strong></p>
@@ -38,6 +39,7 @@
         <div id="spinner-logo" class="spinner hidden"></div>
     </section>
 
+    <!-- Speaker Resizer -->
     <section id="speaker-area" class="hidden-area">
         <div id="drop-area-speaker" class="drop-area">
             <p><strong>Drag and drop speaker photos here</strong></p>
@@ -57,11 +59,7 @@
     </section>
 </main>
 
-<footer>
-    <p>&copy; 2025 Image Resizer Pro | Built for BEN</p>
-</footer>
-
-<!-- Modal for editing -->
+<!-- Modal for Editing -->
 <div id="edit-modal" class="hidden">
     <div class="edit-content">
         <canvas id="edit-canvas" width="591" height="591"></canvas>
@@ -76,6 +74,10 @@
 <div id="toast" class="hidden">Images processed successfully!</div>
 
 <canvas id="canvas" style="display:none;"></canvas>
+
+<footer>
+    <p>&copy; 2025 Image Resizer Pro | Built for BEN</p>
+</footer>
 
 <script src="script.js"></script>
 
