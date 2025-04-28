@@ -1,4 +1,33 @@
-// Elements for both tabs
+// Tabs Switching
+const logoTab = document.getElementById('logo-tab');
+const speakerTab = document.getElementById('speaker-tab');
+const logoArea = document.getElementById('logo-area');
+const speakerArea = document.getElementById('speaker-area');
+
+logoTab.addEventListener('click', () => {
+    logoTab.classList.add('active');
+    speakerTab.classList.remove('active');
+    logoArea.classList.add('active-area');
+    logoArea.classList.remove('hidden-area');
+    speakerArea.classList.remove('active-area');
+    speakerArea.classList.add('hidden-area');
+});
+
+speakerTab.addEventListener('click', () => {
+    speakerTab.classList.add('active');
+    logoTab.classList.remove('active');
+    speakerArea.classList.add('active-area');
+    speakerArea.classList.remove('hidden-area');
+    logoArea.classList.remove('active-area');
+    logoArea.classList.add('hidden-area');
+});
+
+// Common Elements
+const toast = document.getElementById('toast');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+// Logo Elements
 const uploadLogo = document.getElementById('upload-logo');
 const dropAreaLogo = document.getElementById('drop-area-logo');
 const galleryLogo = document.getElementById('gallery-logo');
@@ -7,6 +36,9 @@ const restartButtonLogo = document.getElementById('restart-logo');
 const downloadLinkLogo = document.getElementById('downloadLink-logo');
 const spinnerLogo = document.getElementById('spinner-logo');
 
+let logoFiles = [];
+
+// Speaker Elements
 const uploadSpeaker = document.getElementById('upload-speaker');
 const dropAreaSpeaker = document.getElementById('drop-area-speaker');
 const gallerySpeaker = document.getElementById('gallery-speaker');
@@ -15,55 +47,24 @@ const restartButtonSpeaker = document.getElementById('restart-speaker');
 const downloadLinkSpeaker = document.getElementById('downloadLink-speaker');
 const spinnerSpeaker = document.getElementById('spinner-speaker');
 
-const mainCanvas = document.getElementById('canvas');
-const mainCtx = mainCanvas.getContext('2d');
-const toast = document.getElementById('toast');
-
-const editModal = document.getElementById('edit-modal');
-const editCanvas = document.getElementById('edit-canvas');
-const editCtx = editCanvas.getContext('2d');
-const zoomInButton = document.getElementById('zoom-in');
-const zoomOutButton = document.getElementById('zoom-out');
-const doneEditingButton = document.getElementById('done-editing');
-
-const logoTab = document.getElementById('logo-tab');
-const speakerTab = document.getElementById('speaker-tab');
-const logoArea = document.getElementById('logo-area');
-const speakerArea = document.getElementById('speaker-area');
-
-let logoFiles = [];
 let speakerFiles = [];
 let speakerEditData = [];
 let speakerThumbnails = [];
 let currentEditIndex = null;
 let imgToEdit = null;
 
-logoTab.addEventListener('click', () => {
-    logoTab.classList.add('active');
-    speakerTab.classList.remove('active');
-    logoArea.classList.add('active');
-    speakerArea.classList.remove('active');
-});
-
-speakerTab.addEventListener('click', () => {
-    speakerTab.classList.add('active');
-    logoTab.classList.remove('active');
-    speakerArea.classList.add('active');
-    logoArea.classList.remove('active');
-});
-
+// Logo Upload
 dropAreaLogo.addEventListener('click', () => uploadLogo.click());
-dropAreaLogo.addEventListener('dragover', e => { e.preventDefault(); dropAreaLogo.classList.add('highlight'); });
-dropAreaLogo.addEventListener('dragleave', e => { e.preventDefault(); dropAreaLogo.classList.remove('highlight'); });
+dropAreaLogo.addEventListener('dragover', e => { e.preventDefault(); });
 dropAreaLogo.addEventListener('drop', e => {
     e.preventDefault();
-    dropAreaLogo.classList.remove('highlight');
     handleLogoFiles(e.dataTransfer.files);
 });
 uploadLogo.addEventListener('change', e => handleLogoFiles(e.target.files));
 
 function handleLogoFiles(files) {
-    if (files.length > 0) resetLogoUI();
+    logoFiles = [];
+    galleryLogo.innerHTML = '';
     for (let file of files) {
         if (file.type.startsWith('image/')) {
             logoFiles.push(file);
@@ -78,7 +79,7 @@ function displayLogoThumbnail(file) {
         const thumb = document.createElement('div');
         thumb.className = 'thumb';
         thumb.innerHTML = `
-            <img src="${e.target.result}" alt="Logo Thumbnail">
+            <img src="${e.target.result}">
             <input type="checkbox" checked>
         `;
         galleryLogo.appendChild(thumb);
@@ -87,42 +88,32 @@ function displayLogoThumbnail(file) {
 }
 
 processButtonLogo.addEventListener('click', async () => {
-    const thumbs = Array.from(galleryLogo.querySelectorAll('.thumb'));
-    const selectedFiles = thumbs.map((thumb, i) => thumb.querySelector('input').checked ? logoFiles[i] : null).filter(f => f);
-
-    if (selectedFiles.length === 0) {
+    const selected = logoFiles.filter((_, i) => galleryLogo.querySelectorAll('input')[i].checked);
+    if (selected.length === 0) {
         alert("Please select at least one logo to process.");
         return;
     }
-
-    processButtonLogo.disabled = true;
-    restartButtonLogo.disabled = true;
     spinnerLogo.classList.remove('hidden');
-
     try {
-        if (selectedFiles.length === 1) {
-            const img = await loadImage(selectedFiles[0]);
+        if (selected.length === 1) {
+            const img = await loadImage(selected[0]);
             const processed = processLogo(img);
             triggerDownload(processed, 'processed-logo.png');
         } else {
             const zip = new JSZip();
-            for (let i = 0; i < selectedFiles.length; i++) {
-                const img = await loadImage(selectedFiles[i]);
+            for (let i = 0; i < selected.length; i++) {
+                const img = await loadImage(selected[i]);
                 const processed = processLogo(img);
                 zip.file(`processed-logo-${i + 1}.png`, processed.split(',')[1], { base64: true });
             }
-            const blob = await zip.generateAsync({ type: "blob" });
-            const link = URL.createObjectURL(blob);
-            downloadLinkLogo.href = link;
+            const blob = await zip.generateAsync({ type: 'blob' });
+            const url = URL.createObjectURL(blob);
+            downloadLinkLogo.href = url;
             downloadLinkLogo.download = 'processed-logos.zip';
             downloadLinkLogo.style.display = 'inline-block';
         }
-    } catch (error) {
-        alert("Something went wrong while processing logos.");
     } finally {
         spinnerLogo.classList.add('hidden');
-        processButtonLogo.disabled = false;
-        restartButtonLogo.disabled = false;
         showToast();
     }
 });
@@ -130,83 +121,71 @@ processButtonLogo.addEventListener('click', async () => {
 restartButtonLogo.addEventListener('click', () => {
     logoFiles = [];
     galleryLogo.innerHTML = '';
-    resetLogoUI();
+    downloadLinkLogo.style.display = 'none';
 });
 
-function resetLogoUI() {
-    spinnerLogo.classList.add('hidden');
-    downloadLinkLogo.style.display = 'none';
-    toast.classList.add('hidden');
-}
-
+// Logo Processing
 function processLogo(img) {
-    mainCanvas.width = 350;
-    mainCanvas.height = 200;
+    canvas.width = 350;
+    canvas.height = 200;
     const padding = 15;
-    const maxWidth = 350 - 2 * padding;
-    const maxHeight = 200 - 2 * padding;
-    mainCtx.fillStyle = 'white';
-    mainCtx.fillRect(0, 0, 350, 200);
+    const maxWidth = 350 - padding * 2;
+    const maxHeight = 200 - padding * 2;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 350, 200);
 
     let width = img.width;
     let height = img.height;
-    const aspectRatio = width / height;
+    const aspect = width / height;
 
     if (width > maxWidth) {
         width = maxWidth;
-        height = width / aspectRatio;
+        height = width / aspect;
     }
     if (height > maxHeight) {
         height = maxHeight;
-        width = height * aspectRatio;
+        width = height * aspect;
     }
 
     const x = (350 - width) / 2;
     const y = (200 - height) / 2;
-    mainCtx.drawImage(img, x, y, width, height);
+    ctx.drawImage(img, x, y, width, height);
 
-    return mainCanvas.toDataURL('image/png');
+    return canvas.toDataURL('image/png');
 }
 
+// Speaker Upload
 dropAreaSpeaker.addEventListener('click', () => uploadSpeaker.click());
-dropAreaSpeaker.addEventListener('dragover', e => { e.preventDefault(); dropAreaSpeaker.classList.add('highlight'); });
-dropAreaSpeaker.addEventListener('dragleave', e => { e.preventDefault(); dropAreaSpeaker.classList.remove('highlight'); });
+dropAreaSpeaker.addEventListener('dragover', e => { e.preventDefault(); });
 dropAreaSpeaker.addEventListener('drop', e => {
     e.preventDefault();
-    dropAreaSpeaker.classList.remove('highlight');
     handleSpeakerFiles(e.dataTransfer.files);
 });
 uploadSpeaker.addEventListener('change', e => handleSpeakerFiles(e.target.files));
 
 function handleSpeakerFiles(files) {
-    if (files.length > 0) resetSpeakerUI();
     for (let file of files) {
         if (file.type.startsWith('image/')) {
             const index = speakerFiles.length;
             speakerFiles.push(file);
             speakerEditData.push({ offsetX: 0, offsetY: 0, scale: 1 });
-            createSpeakerThumbnail(file, index, true);
+            displaySpeakerThumbnail(file, index, true);
         }
     }
 }
 
-function createSpeakerThumbnail(file, index, initial = false) {
+function displaySpeakerThumbnail(file, index, initial = false) {
     const reader = new FileReader();
     reader.onload = e => {
         const img = new Image();
         img.onload = () => {
-            let scale, offsetX = 0, offsetY = 0;
+            let scale;
             if (img.width > img.height) {
-                scale = (591 + 10) / img.height;
-                offsetX = (591 - img.width * scale) / 2;
+                scale = (591 / img.height) * 1.1;
             } else {
-                scale = (591 + 10) / img.width;
-                offsetY = 0;
+                scale = (591 / img.width) * 1.1;
             }
-
-            if (initial) {
-                speakerEditData[index] = { offsetX, offsetY, scale };
-            }
+            speakerEditData[index] = { offsetX: 0, offsetY: 0, scale };
 
             const thumbCanvas = document.createElement('canvas');
             thumbCanvas.width = 300;
@@ -214,14 +193,14 @@ function createSpeakerThumbnail(file, index, initial = false) {
             const thumbCtx = thumbCanvas.getContext('2d');
             thumbCtx.fillStyle = 'white';
             thumbCtx.fillRect(0, 0, 300, 300);
-            thumbCtx.drawImage(img, offsetX * (300/591), offsetY * (300/591), img.width * scale * (300/591), img.height * scale * (300/591));
+            thumbCtx.drawImage(img, 0, 0, img.width * scale * (300/591), img.height * scale * (300/591));
 
             const thumb = document.createElement('div');
             thumb.className = 'thumb';
             thumb.innerHTML = `
-                <img src="${thumbCanvas.toDataURL('image/png')}" alt="Speaker Thumbnail">
+                <img src="${thumbCanvas.toDataURL('image/png')}">
                 <input type="checkbox" checked>
-                <button class="edit-button" data-index="${index}"><i class="fas fa-edit"></i></button>
+                <button class="edit-button" data-index="${index}">&#9998;</button>
             `;
             gallerySpeaker.appendChild(thumb);
             speakerThumbnails[index] = thumb.querySelector('img');
@@ -239,17 +218,8 @@ function openEditor(index) {
     reader.onload = e => {
         imgToEdit = new Image();
         imgToEdit.onload = () => {
-            let scale, offsetX = 0, offsetY = 0;
-            if (imgToEdit.width > imgToEdit.height) {
-                scale = (591 + 10) / imgToEdit.height;
-                offsetX = (591 - imgToEdit.width * scale) / 2;
-            } else {
-                scale = (591 + 10) / imgToEdit.width;
-                offsetY = 0;
-            }
-            speakerEditData[index] = { offsetX, offsetY, scale };
             drawEditCanvas();
-            editModal.classList.remove('hidden');
+            document.getElementById('edit-modal').classList.remove('hidden');
         };
         imgToEdit.src = e.target.result;
     };
@@ -258,44 +228,26 @@ function openEditor(index) {
 
 function drawEditCanvas() {
     const { offsetX, offsetY, scale } = speakerEditData[currentEditIndex];
+    const editCanvas = document.getElementById('edit-canvas');
+    const editCtx = editCanvas.getContext('2d');
     editCtx.fillStyle = 'white';
     editCtx.fillRect(0, 0, 591, 591);
-    const scaledWidth = imgToEdit.width * scale;
-    const scaledHeight = imgToEdit.height * scale;
-    editCtx.drawImage(imgToEdit, offsetX, offsetY, scaledWidth, scaledHeight);
+    editCtx.drawImage(imgToEdit, offsetX, offsetY, imgToEdit.width * scale, imgToEdit.height * scale);
 }
 
-let isDragging = false;
-let lastX = 0, lastY = 0;
-
-editCanvas.addEventListener('mousedown', e => {
-    isDragging = true;
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-});
-editCanvas.addEventListener('mouseup', () => isDragging = false);
-editCanvas.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    const dx = e.offsetX - lastX;
-    const dy = e.offsetY - lastY;
-    speakerEditData[currentEditIndex].offsetX += dx;
-    speakerEditData[currentEditIndex].offsetY += dy;
-    lastX = e.offsetX;
-    lastY = e.offsetY;
-    drawEditCanvas();
-});
-
-zoomInButton.addEventListener('click', () => {
+// Zoom and Pan
+document.getElementById('zoom-in').addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale *= 1.07;
     drawEditCanvas();
 });
-zoomOutButton.addEventListener('click', () => {
+
+document.getElementById('zoom-out').addEventListener('click', () => {
     speakerEditData[currentEditIndex].scale /= 1.07;
     drawEditCanvas();
 });
 
-doneEditingButton.addEventListener('click', () => {
-    editModal.classList.add('hidden');
+document.getElementById('done-editing').addEventListener('click', () => {
+    document.getElementById('edit-modal').classList.add('hidden');
     updateSpeakerThumbnail(currentEditIndex);
 });
 
@@ -311,67 +263,50 @@ function updateSpeakerThumbnail(index) {
     speakerThumbnails[index].src = tempCanvas.toDataURL('image/png');
 }
 
+// Speaker Processing
 processButtonSpeaker.addEventListener('click', async () => {
-    const thumbs = Array.from(gallerySpeaker.querySelectorAll('.thumb'));
-    const selectedFiles = thumbs.map((thumb, i) => thumb.querySelector('input').checked ? speakerFiles[i] : null).filter(f => f);
-
-    if (selectedFiles.length === 0) {
-        alert("Please select at least one speaker photo to process.");
+    const selected = speakerFiles.filter((_, i) => gallerySpeaker.querySelectorAll('input')[i].checked);
+    if (selected.length === 0) {
+        alert("Please select at least one speaker image.");
         return;
     }
-
-    processButtonSpeaker.disabled = true;
-    restartButtonSpeaker.disabled = true;
     spinnerSpeaker.classList.remove('hidden');
-
     try {
         const zip = new JSZip();
         for (let i = 0; i < speakerFiles.length; i++) {
-            if (!thumbs[i].querySelector('input').checked) continue;
+            if (!gallerySpeaker.querySelectorAll('input')[i].checked) continue;
             const img = await loadImage(speakerFiles[i]);
             const processed = processSpeaker(img, speakerEditData[i]);
             zip.file(`processed-speaker-${i + 1}.png`, processed.split(',')[1], { base64: true });
         }
-        const blob = await zip.generateAsync({ type: "blob" });
-        const link = URL.createObjectURL(blob);
-        downloadLinkSpeaker.href = link;
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = URL.createObjectURL(blob);
+        downloadLinkSpeaker.href = url;
         downloadLinkSpeaker.download = 'processed-speakers.zip';
         downloadLinkSpeaker.style.display = 'inline-block';
-    } catch (error) {
-        alert("Something went wrong while processing speaker photos.");
     } finally {
         spinnerSpeaker.classList.add('hidden');
-        processButtonSpeaker.disabled = false;
-        restartButtonSpeaker.disabled = false;
         showToast();
     }
 });
 
 restartButtonSpeaker.addEventListener('click', () => {
     speakerFiles = [];
-    speakerEditData = [];
-    speakerThumbnails = [];
     gallerySpeaker.innerHTML = '';
-    resetSpeakerUI();
+    downloadLinkSpeaker.style.display = 'none';
 });
 
-function resetSpeakerUI() {
-    spinnerSpeaker.classList.add('hidden');
-    downloadLinkSpeaker.style.display = 'none';
-    toast.classList.add('hidden');
-}
-
+// Speaker Processing
 function processSpeaker(img, { offsetX, offsetY, scale }) {
-    mainCanvas.width = 591;
-    mainCanvas.height = 591;
-    mainCtx.fillStyle = 'white';
-    mainCtx.fillRect(0, 0, 591, 591);
-    const scaledWidth = img.width * scale;
-    const scaledHeight = img.height * scale;
-    mainCtx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
-    return mainCanvas.toDataURL('image/png');
+    canvas.width = 591;
+    canvas.height = 591;
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 591, 591);
+    ctx.drawImage(img, offsetX, offsetY, img.width * scale, img.height * scale);
+    return canvas.toDataURL('image/png');
 }
 
+// Helpers
 function loadImage(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -385,14 +320,14 @@ function loadImage(file) {
     });
 }
 
-function showToast() {
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 3000);
-}
-
 function triggerDownload(dataUrl, filename) {
     const link = document.createElement('a');
     link.href = dataUrl;
     link.download = filename;
     link.click();
+}
+
+function showToast() {
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
 }
