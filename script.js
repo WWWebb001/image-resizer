@@ -4,11 +4,11 @@
 const CONFIG = {
     logoCanvas: { width: 350, height: 200, padding: 15 },
     speakerCanvas: { size: 591, thumbSize: 300 },
-    zoomBuffer: 1.1,
-    zoomStep: 1.07,
+    zoomBuffer: 1.1, // 10% zoom on initial speaker images
+    zoomStep: 1.07, // Zoom increment (7% per click)
     alignment: {
-        landscape: "top-center",
-        portrait: "center"
+        landscape: "top-center", // Options: top-center, center, bottom-center
+        portrait: "center" // Options: top-center, center, bottom-center
     },
     editBorder: {
         normal: "4px solid green",
