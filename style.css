@@ -30,15 +30,14 @@ header p {
 }
 
 /* Footer */
-Footer {
-  background-color: #34495e;
-  padding: 30px 0;
-  text-align: center;
-  color: white;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-
+footer {
+    background-color: #34495e;
+    padding: 30px 0;
+    text-align: center;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }
 
 /* Tabs */
@@ -147,10 +146,15 @@ Footer {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.edit-button:hover {
+    background: #2980b9;
 }
 
 .edit-button i {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 /* Buttons */
@@ -170,10 +174,19 @@ Footer {
     font-size: 1em;
     text-decoration: none;
     cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.buttons button:hover {
+    background: #2980b9;
 }
 
 .buttons a {
     background: #2ecc71;
+}
+
+.buttons a:hover {
+    background: #27ae60;
 }
 
 /* Spinner */
@@ -239,10 +252,49 @@ Footer {
     text-align: center;
 }
 
+/* 🖌️ Added 2px black border around canvas */
+#edit-canvas {
+    border: 2px solid #000;
+}
+
+/* 🔥 Improved edit buttons (Zoom and Done icons) */
 .edit-buttons {
     margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
 }
 
 .edit-buttons button {
-    margin: 0 10px;
+    background: #34495e;
+    color: white;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.edit-buttons button:hover {
+    background: #2c3e50;
+}
+
+.edit-buttons button#done-editing {
+    background: #2ecc71;
+    width: auto;
+    padding: 0 20px;
+    border-radius: 8px;
+}
+
+.edit-buttons button#done-editing:hover {
+    background: #27ae60;
+}
+
+.edit-buttons button i {
+    font-size: 24px;
 }
