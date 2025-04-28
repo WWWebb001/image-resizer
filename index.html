@@ -5,97 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Resizer Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-image"></i> Image Resizer Pro</h1>
-        <p>Resize your logos or speaker photos with style!</p>
-    </header>
 
-    <main class="container">
-        <!-- Tabs -->
-        <div class="tabs">
-            <button class="tab-button active" id="logo-tab">Resize a Logo</button>
-            <button class="tab-button" id="speaker-tab">Resize a Speaker's Photo</button>
+<header>
+    <h1><i class="fas fa-image"></i> Image Resizer Pro</h1>
+    <p>Resize your logos or speaker photos with style!</p>
+</header>
+
+<div class="tabs">
+    <div class="tab active" id="logo-tab">Resize a Logo</div>
+    <div class="tab" id="speaker-tab">Resize a Speaker's Photo</div>
+</div>
+
+<main class="container">
+    <section id="logo-area" class="active-area">
+        <div id="drop-area-logo" class="drop-area">
+            <p><strong>Drag and drop your logos here</strong></p>
+            <p>or <label for="upload-logo" class="browse-button">browse files</label></p>
+            <input type="file" id="upload-logo" accept="image/*" multiple>
         </div>
 
-        <!-- Logo Resize Area -->
-        <div id="logo-area" class="tab-content active">
-            <div id="drop-area-logo" class="drop-area">
-                <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
-                <p><strong>Drag and drop your logos here</strong></p>
-                <p>or <label for="upload-logo" class="browse-button">browse files</label></p>
-                <input type="file" id="upload-logo" accept="image/*" multiple>
-            </div>
+        <div id="gallery-logo"></div>
 
-            <div id="spinner-logo" class="hidden">
-                <i class="fas fa-spinner fa-spin fa-3x"></i>
-                <p>Processing Images...</p>
-            </div>
-
-            <div id="gallery-logo"></div>
-
-            <div class="buttons">
-                <button id="process-logo"><i class="fas fa-cog"></i> Process Logos</button>
-                <button id="restart-logo"><i class="fas fa-undo"></i> Restart</button>
-                <a id="downloadLink-logo" style="display:none;"><i class="fas fa-download"></i> Download</a>
-            </div>
+        <div class="buttons">
+            <button id="process-logo">Process Logos</button>
+            <button id="restart-logo">Restart</button>
+            <a id="downloadLink-logo" style="display:none;">Download Logos</a>
         </div>
 
-        <!-- Speaker Photo Resize Area -->
-        <div id="speaker-area" class="tab-content">
-            <div id="drop-area-speaker" class="drop-area">
-                <p><i class="fas fa-cloud-upload-alt fa-2x"></i></p>
-                <p><strong>Drag and drop speaker photos here</strong></p>
-                <p>or <label for="upload-speaker" class="browse-button">browse files</label></p>
-                <input type="file" id="upload-speaker" accept="image/*" multiple>
-            </div>
+        <div id="spinner-logo" class="spinner hidden"></div>
+    </section>
 
-            <div id="spinner-speaker" class="hidden">
-                <i class="fas fa-spinner fa-spin fa-3x"></i>
-                <p>Processing Images...</p>
-            </div>
-
-            <div id="gallery-speaker"></div>
-
-            <div class="buttons">
-                <button id="process-speaker"><i class="fas fa-cog"></i> Process Speaker Photos</button>
-                <button id="restart-speaker"><i class="fas fa-undo"></i> Restart</button>
-                <a id="downloadLink-speaker" style="display:none;"><i class="fas fa-download"></i> Download</a>
-            </div>
+    <section id="speaker-area" class="hidden-area">
+        <div id="drop-area-speaker" class="drop-area">
+            <p><strong>Drag and drop speaker photos here</strong></p>
+            <p>or <label for="upload-speaker" class="browse-button">browse files</label></p>
+            <input type="file" id="upload-speaker" accept="image/*" multiple>
         </div>
-    </main>
 
-    <footer>
-        <p>&copy; 2025 Image Resizer Pro. All rights reserved - BEN WEBB IS AWESOME LTD.</p>
-    </footer>
+        <div id="gallery-speaker"></div>
 
-    <!-- Hidden canvas for processing -->
-    <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
+        <div class="buttons">
+            <button id="process-speaker">Process Speakers</button>
+            <button id="restart-speaker">Restart</button>
+            <a id="downloadLink-speaker" style="display:none;">Download Speakers</a>
+        </div>
 
-    <!-- Toast -->
-    <div id="toast" class="hidden">
-        <p>Images processed successfully!</p>
-    </div>
+        <div id="spinner-speaker" class="spinner hidden"></div>
+    </section>
+</main>
 
-    <!-- Modal for Editing Speaker Photos -->
-    <div id="edit-modal" class="hidden">
-        <div id="edit-canvas-container">
-            <canvas id="edit-canvas" width="591" height="591"></canvas>
-            <div id="zoom-controls">
-                <button id="zoom-in"><i class="fas fa-search-plus"></i></button>
-                <button id="zoom-out"><i class="fas fa-search-minus"></i></button>
-            </div>
-            <button id="done-editing" class="edit-done"><i class="fas fa-check"></i> Done</button>
+<footer>
+    <p>&copy; 2025 Image Resizer Pro | Built for BEN</p>
+</footer>
+
+<!-- Modal for editing -->
+<div id="edit-modal" class="hidden">
+    <div class="edit-content">
+        <canvas id="edit-canvas" width="591" height="591"></canvas>
+        <div class="edit-buttons">
+            <button id="zoom-in">Zoom In</button>
+            <button id="zoom-out">Zoom Out</button>
+            <button id="done-editing">Done</button>
         </div>
     </div>
+</div>
 
-    <!-- Scripts -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
-    <script src="script.js"></script>
+<div id="toast" class="hidden">Images processed successfully!</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+<script src="script.js"></script>
+
 </body>
 </html>
