@@ -255,11 +255,7 @@ function openEditor(index) {
         imgToEdit.src = e.target.result;
     };
     reader.readAsDataURL(speakerFiles[index]);
-}
-        };
-        imgToEdit.src = e.target.result;
-    };
-    reader.readAsDataURL(speakerFiles[index]);
+    
 }
 
 function drawEditCanvas() {
