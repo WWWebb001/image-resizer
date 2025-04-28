@@ -12,6 +12,11 @@ body {
     flex-direction: column;
 }
 
+main {
+    flex: 1 0 auto;
+    padding-bottom: 100px; /* <-- This creates safe breathing room above the sticky footer */
+}
+
 /* Header */
 header {
     background-color: #34495e;
