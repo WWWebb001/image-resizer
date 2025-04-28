@@ -7,7 +7,6 @@
 
 body {
     background-color: #f4f4f4;
-    color: #333;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -50,7 +49,7 @@ header p {
     color: white;
 }
 
-/* Main Area */
+/* Main Container */
 .container {
     max-width: 900px;
     margin: 30px auto;
@@ -75,15 +74,10 @@ header p {
     padding: 50px 20px;
     background: #f9f9f9;
     cursor: pointer;
-    transition: all 0.3s;
     margin-bottom: 30px;
 }
 
-.drop-area:hover {
-    background: #e0e0e0;
-}
-
-/* Galleries */
+/* Gallery */
 #gallery-logo, #gallery-speaker {
     display: flex;
     flex-wrap: wrap;
@@ -94,16 +88,24 @@ header p {
 /* Thumbnails */
 .thumb {
     position: relative;
-    width: 300px;
-    height: 300px;
-    background: white;
     border: 2px solid #ddd;
     border-radius: 10px;
+    background: white;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+#gallery-logo .thumb {
+    width: 150px;
+    height: 150px;
+}
+
+#gallery-speaker .thumb {
+    width: 300px;
+    height: 300px;
 }
 
 .thumb img {
@@ -148,51 +150,14 @@ header p {
     color: white;
     padding: 12px 20px;
     border-radius: 8px;
-    text-decoration: none;
     border: none;
     font-size: 1em;
+    text-decoration: none;
     cursor: pointer;
 }
 
 .buttons a {
     background: #2ecc71;
-}
-
-.buttons button:hover, .buttons a:hover {
-    opacity: 0.8;
-}
-
-/* Modal */
-#edit-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-#edit-modal.hidden {
-    display: none;
-}
-
-.edit-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.edit-buttons {
-    margin-top: 15px;
-}
-
-.edit-buttons button {
-    margin: 0 10px;
 }
 
 /* Spinner */
@@ -233,11 +198,35 @@ header p {
     display: none;
 }
 
-/* Footer */
-footer {
+/* Modal */
+#edit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+#edit-modal.hidden {
+    display: none;
+}
+
+.edit-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
     text-align: center;
-    padding: 20px 0;
-    margin-top: 40px;
-    background: #34495e;
-    color: #ecf0f1;
+}
+
+.edit-buttons {
+    margin-top: 15px;
+}
+
+.edit-buttons button {
+    margin: 0 10px;
 }
