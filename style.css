@@ -318,3 +318,44 @@ footer {
 .edit-buttons button i {
     font-size: 24px;
 }
+
+/* Header layout update */
+header {
+    background-color: #34495e;
+    padding: 40px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: left;
+    flex-wrap: wrap;
+}
+
+/* Icon image on the left */
+.header-icon {
+    height: 100%;
+    max-height: 60px; /* matches header height */
+    margin-right: 30px;
+    object-fit: contain;
+}
+
+/* Text block next to icon */
+.header-text {
+    color: white;
+    flex: 1;
+}
+
+/* Responsive: hide icon on smaller screens */
+@media (max-width: 600px) {
+    .header-icon {
+        display: none;
+    }
+
+    header {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .header-text {
+        flex-basis: 100%;
+    }
+}
