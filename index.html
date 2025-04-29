@@ -36,6 +36,7 @@
             <div class="buttons">
                 <button id="downloadLink-logo">Download Logos</button>
                 <button id="restart-logo">Restart</button>
+                <div id="spinner-logo" class="spinner hidden">Processing...</div> <!-- ✅ Added logo spinner -->
             </div>
         </div>
 
@@ -52,6 +53,7 @@
             <div class="buttons">
                 <button id="downloadLink-speaker">Download Speakers</button>
                 <button id="restart-speaker">Restart</button>
+                <div id="spinner-speaker" class="spinner hidden">Processing...</div> <!-- ✅ Added speaker spinner -->
             </div>
         </div>
     </main>
@@ -60,7 +62,7 @@
         <p>&copy; 2025 Image Resizer Pro. All rights reserved.</p>
     </footer>
 
-    <!-- Hidden canvas -->
+    <!-- Hidden canvases -->
     <canvas id="canvas" width="350" height="200" style="display:none;"></canvas>
     <canvas id="speaker-canvas" width="591" height="591" style="display:none;"></canvas>
 
@@ -77,9 +79,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Spinner -->
-    <div id="spinner" class="spinner hidden"></div>
 
     <!-- Toast Message -->
     <div id="toast" class="hidden">Images processed successfully!</div>
